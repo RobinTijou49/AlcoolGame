@@ -7,11 +7,11 @@
 // Configuration de l'app Web Firebase (console Firebase → Paramètres du projet → Vos applications → Web).
 // Ce n'est pas une donnée secrète. Tant que apiKey est vide, aucun bouton de compte n'apparaît.
 const FIREBASE_CONFIG = {
-  apiKey: '',
+  apiKey: 'AIzaSyBaENuga5UjphIJZ5g4LuZG5OX3QrDNJzU',
   authDomain: 'tournee-81b4c.firebaseapp.com',
   databaseURL: 'https://tournee-81b4c-default-rtdb.europe-west1.firebasedatabase.app',
   projectId: 'tournee-81b4c',
-  appId: ''
+  appId: '1:573393514642:web:f183d03878283a9b8b364b'
 };
 const FB_SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
 
