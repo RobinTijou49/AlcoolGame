@@ -1,0 +1,10 @@
+# Netlify : publie le site (web/) et les fonctions de paiement (netlify/functions/).
+# Dans Netlify, « Base directory » doit rester vide pour que ce fichier soit lu.
+[build]
+  publish = "web"
+  functions = "netlify/functions"
+  command = ""
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["firebase-admin"]

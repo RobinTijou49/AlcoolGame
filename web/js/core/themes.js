@@ -1,4 +1,4 @@
-// Thème de la soirée (onglet À boire) : Soft, Normal, Hard ou Hot (premium, réservé aux adultes ; payant quand HOT_PAID est vrai).
+// Thème de la soirée (onglet À boire) : Soft, Normal, Hard ou Hot (premium, réservé aux adultes ; payant quand la vente est ouverte, voir core/account.js).
 // Il change le contenu des jeux : phrases de Je n'ai jamais, défis et questions d'Action ou vérité, actions des cartes
 // du Palmier et du Barbu. Les gorgées des autres jeux ne changent pas.
 
@@ -72,7 +72,7 @@ Object.assign(A, {
   setTheme(id) {
     if (!THEMES.some(t => t.id === id)) return;
     if (id === 'hot' && !store.get('adult', false)) { S.hotAsk = true; render(); return; }
-    if (id === 'hot' && HOT_PAID && !buy('hot', 'Thème Hot')) return; // payant : il faut l'avoir acheté (core/account.js)
+    if (id === 'hot' && hotPaid() && !buy('hot', 'Thème Hot')) return; // payant : il faut l'avoir acheté (core/account.js)
     S.theme = id; S.hotAsk = false; store.set('theme', id);
     S.rules = { palmier: loadRules('palmier'), barbu: loadRules('barbu') };
     render(); track('theme_change', { theme: id });
@@ -88,11 +88,11 @@ function themeHTML() {
   const cur = THEMES.find(t => t.id === S.theme);
   return `<div class="section">
       <span class="label">Thème de la soirée</span>
-      <div class="themes">${THEMES.map(t => `<button class="chip pick ${t.premium ? 'premium' : ''}" data-act="setTheme" data-arg="${t.id}" aria-pressed="${S.theme === t.id}">${t.name}${t.premium ? '<small>Premium</small>' : ''}</button>`).join('')}</div>
+      <div class="themes">${THEMES.map(t => `<button class="chip pick ${t.premium ? 'premium' : ''}" data-act="setTheme" data-arg="${t.id}" aria-pressed="${S.theme === t.id}">${t.name}${t.premium ? `<small>${hotPaid() && !owns(t.id) ? HOT_PRICE : 'Premium'}</small>` : ''}</button>`).join('')}</div>
       ${S.hotAsk
         ? `<div class="panel"><b>Thème Hot : réservé aux adultes</b>
             <p style="margin:0;font-size:14px">Il contient des questions et des défis sexy. Tu confirmes avoir 18 ans ou plus ? Chaque défi qui touche quelqu’un se fait seulement s’il ou elle est d’accord. Refuser et boire fait partie du jeu.</p>
-            <p class="muted" style="margin:0;font-size:13px">Premium, gratuit pour le moment.</p>
+            <p class="muted" style="margin:0;font-size:13px">${hotPaid() ? (owns('hot') ? 'Premium, déjà acheté.' : `Premium, ${HOT_PRICE}, une seule fois. Il te suivra sur tous tes appareils.`) : 'Premium, gratuit pour le moment.'}</p>
             <div class="choices"><button class="btn" data-act="hotConfirm" data-arg="0">Annuler</button><button class="btn primary" data-act="hotConfirm" data-arg="1">J’ai 18 ans ou plus</button></div></div>`
         : `<p class="muted" style="margin:0;font-size:13.5px">${cur.desc} Change les phrases de Je n’ai jamais et d’Action ou vérité, et les cartes du Palmier et du Barbu.</p>`}
     </div>`;

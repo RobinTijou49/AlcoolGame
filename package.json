@@ -7,5 +7,9 @@
     "setup": "npm install @capacitor/core@latest @capacitor/android@latest && npm install -D @capacitor/cli@latest @capacitor/assets@latest",
     "android:init": "npx cap add android && npx capacitor-assets generate --android",
     "android": "npx cap sync android && npx cap open android"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.10.0",
+    "stripe": "^17.7.0"
   }
 }

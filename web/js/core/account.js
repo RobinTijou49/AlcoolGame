@@ -76,7 +76,7 @@ function setOwned(list) {
   ACC.owned = new Set(list);
   store.set('owned', list);
   applySkin(); // un skin qui n'est plus possédé revient au skin gratuit
-  if (HOT_PAID && S.theme === 'hot' && !owns('hot')) A.setTheme('normal');
+  if (hotPaid() && S.theme === 'hot' && !owns('hot')) A.setTheme('normal');
 }
 function accFail(e) {
   ACC.busy = false;
@@ -96,20 +96,61 @@ function accFail(e) {
 }
 
 // ---------- Achats ----------
-// Le thème Hot est payant seulement quand ce réglage passe à true (gratuit pour l'instant)
-const HOT_PAID = false;
+// Paiement par Stripe, via les fonctions Netlify (netlify/functions) : /api/checkout crée la page de paiement,
+// /api/stripe-webhook ajoute l'achat au compte quand Stripe confirme. Prix réels : netlify/lib/shop.mjs.
+// PAY_LIVE : vente ouverte à tout le monde. En attendant, les achats ne marchent qu'en mode test,
+// activé sur un navigateur en ouvrant le site avec ?paytest=1 (et coupé avec ?paytest=0).
+const PAY_LIVE = false;
+const HOT_PRICE = '2,99 €';
+(() => {
+  const t = new URLSearchParams(location.search).get('paytest');
+  if (t === null) return;
+  store.set('paytest', t === '1');
+  history.replaceState(null, '', location.pathname);
+})();
+const PAY = { on: ACC.on && (PAY_LIVE || store.get('paytest', false)), test: !PAY_LIVE && store.get('paytest', false) };
+// Le thème Hot est payant dès que la vente est ouverte (ou en mode test) ; gratuit sinon
+const hotPaid = () => PAY.on;
+
 // Achat d'un article : il faut un compte, pour que l'achat suive la personne sur tous ses appareils
 function buy(id, name) {
   if (owns(id)) return true;
-  if (!ACC.on) { toast(`« ${name} » sera bientôt disponible à l’achat`); return false; }
+  if (!PAY.on) { toast(`« ${name} » sera bientôt disponible à l’achat`); return false; }
   if (!ACC.user) {
     A.account(`Connecte-toi pour acheter « ${name} ». L’achat te suivra sur tous tes appareils.`);
     ACC.then = () => buy(id, name); // une fois connecté, on reprend l'achat
     return false;
   }
-  // Le paiement (Stripe) n'est pas encore branché : il ajoutera users/<uid>/owned/<id> sur le serveur
-  toast(`Le paiement arrive bientôt. « ${name} » sera ajouté au compte ${ACC.user.email}.`);
+  checkout(id);
   return false;
+}
+// Envoie vers la page de paiement Stripe ; au retour, l'app revient avec ?paid=<article>
+async function checkout(id) {
+  toast('Ouverture du paiement…');
+  try {
+    const token = await (await loadAuth()).currentUser.getIdToken();
+    const r = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item: id, token }) });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok || !data.url) throw new Error(data.error || 'network');
+    track('begin_checkout', { item: id });
+    location.href = data.url;
+  } catch (e) {
+    toast(e.message === 'auth' ? 'Reconnecte-toi puis réessaie' : 'Paiement indisponible pour le moment, réessaie plus tard');
+  }
+}
+// Retour de Stripe : l'achat arrive sur le compte quelques secondes après le paiement (webhook), on le guette
+async function awaitPurchase(id) {
+  const auth = await loadAuth();
+  for (let i = 0; i < 12 && !owns(id); i++) {
+    if (auth.currentUser) await refreshOwned(auth.currentUser);
+    if (!owns(id)) await new Promise(r => setTimeout(r, 1500));
+  }
+  if (!owns(id)) { toast('Paiement reçu. L’achat apparaîtra dans quelques instants : « Vérifier mes achats »'); return; }
+  toast(`Merci ! « ${itemName(id)} » est débloqué`);
+  track('purchase', { item: id });
+  if (id === 'hot') A.setTheme('hot');
+  else if (SKINS.some(s => s.id === id)) A.useSkin(id);
+  else render();
 }
 
 // ---------- Fenêtre « Compte » ----------
@@ -223,6 +264,12 @@ if (ACC.on) {
     const email = store.get('accEmail', '');
     if (email) finishEmailLink(email);
     else { ACC.open = true; ACC.step = 'confirm'; loadAuth().catch(accFail); }
+  } else if (params.get('paid')) {
+    // Retour depuis la page de paiement Stripe
+    const id = params.get('paid');
+    history.replaceState(null, '', location.pathname);
+    if (id === 'cancel') toast('Paiement annulé');
+    else if (ACC.user) awaitPurchase(id).catch(() => {});
   } else if (ACC.user) {
     loadAuth().catch(() => {}); // déjà connecté : met à jour les achats en arrière-plan
   }

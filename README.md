@@ -123,6 +123,7 @@ Pour l'activer :
 | `game_start` / `game_end` / `game_restart` | Partie lancée / quittée / relancée sur un téléphone | `game`, `players`, `duration_sec` |
 | `online_create` / `online_join` / `online_start` | Jeu en ligne | `method` (qr, lien, code), `game`, `players` |
 | `setting_change` | Réglage modifié | `game`, `setting` |
+| `begin_checkout` / `purchase` | Page de paiement ouverte / achat débloqué | `item` |
 | `login` | Connexion au compte | `method` (google, email) |
 | `theme_change` | Thème de la soirée choisi | `theme` (soft, normal, hard, hot) |
 | `skin_use` / `skin_interest` | Skin activé / skin premium touché | `skin` |
@@ -152,7 +153,22 @@ Pour l'activer :
 3. Authentication → Paramètres → **Domaines autorisés** : ajouter l'adresse du site Netlify (ex. `ton-site.netlify.app`).
 4. **Realtime Database** → Règles : coller le contenu de `database.rules.json`, puis Publier.
 
-Le thème Hot devient payant en passant `HOT_PAID` à `true` dans `account.js` (il reste gratuit en attendant).
+### Paiement (Stripe)
+
+- `netlify/functions/checkout.mjs` (`/api/checkout`) : vérifie le compte et crée la page de paiement Stripe.
+- `netlify/functions/stripe-webhook.mjs` (`/api/stripe-webhook`) : Stripe y confirme le paiement, la fonction écrit
+  `users/<uid>/owned/<article>` dans Firebase. C'est le seul endroit qui débloque un achat.
+- `netlify/lib/shop.mjs` : **les prix qui font foi** (Hot 2,99 €, Pression et Bistrot 0,99 €, Carré d'or et Néon 1,99 €).
+  Garder les mêmes dans `web/js/pages/shop.js` et `HOT_PRICE` de `web/js/core/account.js`.
+- `netlify.toml` : publie `web/` et les fonctions. Dans Netlify, **Base directory doit être vide**.
+
+Variables d'environnement Netlify (Project configuration → Environment variables) :
+`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`.
+
+**Mode test** : tant que `PAY_LIVE` vaut `false` dans `account.js`, personne ne peut acheter, sauf sur un navigateur où l'on a
+ouvert `https://tourneegame.netlify.app/?paytest=1` (`?paytest=0` pour en sortir). Hot y devient payant et un bandeau
+rappelle la carte de test Stripe 4242 4242 4242 4242. Pour ouvrir la vente : clés Stripe *live* dans Netlify, nouveau webhook
+en mode live, puis `PAY_LIVE = true`.
 
 ## App Android
 
