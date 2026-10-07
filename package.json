@@ -1,0 +1,11 @@
+{
+  "name": "tournee",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tournée : jeux de cartes de soirée (Palmier, Rivière, Purple, Autoroute, Pyramide, Ascenseur, Barbu).",
+  "scripts": {
+    "setup": "npm install @capacitor/core@latest @capacitor/android@latest && npm install -D @capacitor/cli@latest @capacitor/assets@latest",
+    "android:init": "npx cap add android && npx capacitor-assets generate --android",
+    "android": "npx cap sync android && npx cap open android"
+  }
+}

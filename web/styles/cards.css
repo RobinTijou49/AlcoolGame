@@ -1,0 +1,23 @@
+/* Cartes à jouer : face, dos (couleurs du skin choisi), tailles et animation de distribution. */
+
+.card{position:relative;width:var(--cw);aspect-ratio:5/7;max-width:100%;border-radius:calc(var(--cw)*.12);background:var(--face);color:var(--face-ink);border:2px solid var(--face-edge);box-shadow:0 2px 0 rgba(0,0,0,.25),0 6px 14px rgba(0,0,0,.35);flex:none;font-family:var(--body);font-weight:800;user-select:none}
+.card.red{color:var(--face-red)}
+.card .tl,.card .br{position:absolute;font-size:calc(var(--cw)*.2);line-height:1;text-align:center}
+.card .tl{top:7%;left:9%}
+.card .br{bottom:7%;right:9%;transform:rotate(180deg)}
+.card .pip{position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--cw)*.5)}
+.card.back{background:var(--back);border:3px solid var(--back-edge)}
+.card.empty{background:transparent;border:2px dashed var(--line);box-shadow:none}
+.card.used{opacity:.3;filter:grayscale(.6)}
+.card.hl{outline:3px solid var(--accent);outline-offset:3px}
+
+/* Tailles */
+.card.xl{--cw:min(140px,34vw)}
+.card.lg{--cw:96px}
+.card.sm{--cw:40px}
+.card.memo{--cw:min(72px,17vw)}
+
+/* Carte qui vient d'être distribuée */
+.card.deal{animation:deal .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes deal{from{transform:translateY(-18px) rotate(-8deg) scale(.85);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.card.deal{animation:none}}

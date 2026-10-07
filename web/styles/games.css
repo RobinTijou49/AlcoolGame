@@ -1,0 +1,155 @@
+/* Écrans de jeu : en-tête, règles, tour en cours, puis les éléments propres à chaque jeu. */
+
+/* ---------- Commun à tous les jeux ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.top h2{font:400 clamp(18px,5.6vw,26px)/1 var(--display);color:var(--accent);text-align:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+details.rules{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:0 14px}
+details.rules summary{padding:12px 0;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+details.rules summary::after{content:"+";color:var(--accent);font-weight:800}
+details.rules[open] summary::after{content:"–"}
+details.rules ul,details.rules ol{margin:0 0 14px;padding-left:20px;color:var(--muted);font-size:14.5px;display:flex;flex-direction:column;gap:5px}
+details.rules b{color:var(--fg)}
+.turn{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.turn .who{font:400 clamp(28px,9vw,40px)/1.05 var(--display)}
+.turn .sub{color:var(--muted);font-size:14px}
+.verdict{font-weight:800;font-size:18px;text-align:center}
+.verdict.ok{color:var(--good)}
+.verdict.ko{color:var(--bad)}
+.hint{font:400 26px/1.1 var(--display);text-align:center;color:var(--accent)}
+.stats{display:flex;justify-content:center;gap:18px;color:var(--muted);font-size:14px}
+.stats b{color:var(--fg);font-variant-numeric:tabular-nums}
+.hand{display:flex;gap:6px;flex-wrap:wrap}
+.hands{display:flex;flex-direction:column;gap:8px}
+.hands .hrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;background:var(--surface-2);border-radius:10px}
+.hands .hrow .n{font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hands .card{--cw:30px}
+.undo{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:9;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);border-radius:999px;padding:10px 16px;font-weight:800;box-shadow:0 6px 16px rgba(0,0,0,.45)}
+
+/* ---------- Palmier et Barbu : la règle de la carte tirée ---------- */
+.kings{text-align:center;color:var(--muted);font-size:14px}
+.rule-title{font:400 24px/1.1 var(--display);text-align:center;color:var(--accent)}
+.rule-text{text-align:center;font-size:16px}
+
+/* Palmier : anneau de cartes autour du verre */
+.palm{position:relative;width:min(300px,82vw);aspect-ratio:1;margin:0 auto}
+.palm .ring{position:absolute;inset:0}
+.palm .ring .card{position:absolute;left:50%;top:50%;--cw:26px;margin:calc(var(--cw)*-.7) 0 0 calc(var(--cw)*-.5);box-shadow:0 1px 3px rgba(0,0,0,.4);border-width:2px}
+.glass{position:absolute;left:50%;top:50%;width:72px;height:92px;transform:translate(-50%,-50%);border:3px solid var(--fg);border-top:0;border-radius:4px 4px 18px 18px;overflow:hidden;background:rgba(255,255,255,.04)}
+.glass .fill{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(var(--accent),#c47d14);transition:height .5s}
+.glass .foam{position:absolute;left:0;right:0;height:8px;background:var(--card);opacity:.9}
+
+/* Barbu : pioche */
+.deckpile{position:relative;width:86px;height:118px;margin:0 auto}
+.deckpile .card{position:absolute;left:0;top:0;--cw:80px}
+
+/* ---------- Rivière ---------- */
+.river{display:grid;grid-template-columns:auto repeat(5,1fr);gap:6px;align-items:center;justify-items:center}
+.river .rl{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);justify-self:start}
+.river .num{font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.river .card{--cw:min(52px,13vw)}
+.lines{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;text-align:center}
+
+/* ---------- Purple ---------- */
+.pile{display:flex;align-items:center;justify-content:center;gap:14px}
+.stack{position:relative;width:64px;height:90px}
+.stack .card{position:absolute;left:0;top:0;--cw:64px}
+.count{font:400 40px/1 var(--display);font-variant-numeric:tabular-nums}
+.streak{display:flex;gap:6px;justify-content:center}
+.streak i{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.streak i.on{background:var(--good)}
+
+/* ---------- Autoroute ---------- */
+.road{position:relative;background:#2a2a30;border-radius:var(--r);padding:16px 10px;overflow-x:auto}
+.road::before{content:"";position:absolute;left:10px;right:10px;top:50%;border-top:3px dashed rgba(244,234,220,.35)}
+.road .lane{position:relative;display:flex;gap:6px;justify-content:space-between}
+.road .slot{display:flex;flex-direction:column;align-items:center;gap:4px}
+.road .km{font-size:11px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* ---------- Pyramide ---------- */
+.pyr{display:flex;flex-direction:column;gap:6px;align-items:center}
+.pyr .prow{display:flex;gap:6px;align-items:center}
+.pyr .card{--cw:min(46px,10.5vw)}
+.pyr .tag{width:28px;font-size:12px;font-weight:800;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.pyr .tag.on{color:var(--accent)}
+
+/* ---------- Ascenseur ---------- */
+.lift{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;align-items:start}
+.shaft{display:flex;flex-direction:column;gap:3px;background:#2a2a30;border-radius:12px;padding:6px}
+.floor{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:5px 8px;font-weight:800;font-size:15px}
+.floor .seen{display:flex;gap:2px}
+.floor .seen i{width:5px;height:5px;border-radius:50%;background:var(--line)}
+.floor .seen i.on{background:var(--muted)}
+.floor.guess{background:var(--bad);color:#1a0b0b;border-color:var(--bad)}
+.floor.hit{background:var(--good);color:#0b1a12;border-color:var(--good)}
+.floor:disabled{opacity:.35;cursor:not-allowed}
+@media (max-width:360px){.lift{grid-template-columns:78px minmax(0,1fr)}}
+
+/* ---------- Partie en ligne ---------- */
+.codebig{font:400 clamp(48px,16vw,72px)/1 var(--display);letter-spacing:.12em;color:var(--accent)}
+.iconbtn.code{letter-spacing:.12em;color:var(--accent);font-weight:800}
+
+/* ========== Jeux de plateau ========== */
+.hands .hrow.cur{outline:2px solid var(--accent)}
+.chip.cur{border-color:var(--accent);color:var(--accent)}
+
+/* ---------- Uno ---------- */
+.uno{--uw:56px;--uc:#2b2b33;position:relative;display:inline-grid;place-items:center;width:var(--uw);aspect-ratio:5/7.5;border-radius:calc(var(--uw)*.14);background:var(--uc);border:3px solid #fff;box-shadow:0 2px 0 rgba(0,0,0,.25),0 6px 14px rgba(0,0,0,.35);flex:none;overflow:hidden}
+.uno i{font:400 calc(var(--uw)*.36)/1 var(--display);font-style:normal;color:var(--uc);background:#fff;width:78%;aspect-ratio:1/1.35;border-radius:50%;display:grid;place-items:center;transform:rotate(-24deg)}
+.uno-r{--uc:#e5322d}
+.uno-j{--uc:#f2b705}
+.uno-v{--uc:#2a9d4b}
+.uno-b{--uc:#1f6fd1}
+.uno-w,.uno.wild.uno-w{--uc:#14111a;background:conic-gradient(#e5322d 0 25%,#f2b705 0 50%,#2a9d4b 0 75%,#1f6fd1 0)}
+.uno.wild i{color:#14111a}
+.uno.back{--uc:#14111a;background:repeating-linear-gradient(45deg,#14111a 0 6px,#2b2433 6px 12px)}
+.uno.back i{background:#e5322d;color:#fff;font-size:calc(var(--uw)*.28)}
+.unotable{display:flex;align-items:center;justify-content:center;gap:16px}
+.unotable .uno.back{--uw:60px}
+.unocolor{font-weight:800;text-align:center;color:var(--uc);background:color-mix(in srgb,var(--uc) 18%,var(--surface));border:2px solid var(--uc);border-radius:12px;padding:8px 10px;min-width:72px}
+.unocolor small{color:var(--muted);font-weight:600}
+.unohand{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.unobtn{border:0;background:transparent;padding:0;border-radius:10px;transition:transform .12s}
+.unobtn:not(:disabled):active{transform:translateY(-6px)}
+.unobtn.off{opacity:.35;cursor:not-allowed}
+.btn.unopick{background:var(--uc);border-color:var(--uc);color:#fff}
+
+/* ---------- Fléchettes ---------- */
+.dslots{display:flex;justify-content:center;gap:8px}
+.dslot{min-width:64px;text-align:center;padding:6px 10px;border-radius:10px;border:1px dashed var(--line);color:var(--muted);font-weight:800;font-variant-numeric:tabular-nums}
+.dslot.on{border:1px solid var(--accent);color:var(--fg);background:var(--surface-2)}
+.dscore{font:400 22px/1 var(--display);font-variant-numeric:tabular-nums;min-width:3ch;text-align:right}
+
+/* ---------- Puissance 4 ---------- */
+.c4{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:4px;background:#1f4fa8;padding:8px;border-radius:var(--r);max-width:420px;width:100%;margin:0 auto}
+.c4col{display:flex;flex-direction:column;gap:4px;border:0;background:transparent;padding:2px;border-radius:8px}
+.c4col:not(:disabled):hover,.c4col:not(:disabled):active{background:rgba(255,255,255,.12)}
+.c4col:disabled{cursor:default}
+.c4cell{display:block;aspect-ratio:1;border-radius:50%;background:var(--bg);box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+.c4cell.red,.c4dot.red{background:#e5322d}
+.c4cell.yellow,.c4dot.yellow{background:#f2b705}
+.c4cell.win{outline:3px solid #fff;outline-offset:-3px}
+.c4cell.drop{animation:c4drop .3s ease-out}
+@keyframes c4drop{from{transform:translateY(-120%);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.c4cell.drop{animation:none}}
+.c4dot{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;flex:none}
+.dartboard{display:block;width:100%;max-width:360px;aspect-ratio:2/3;margin:0 auto;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.dartboard.locked{cursor:default}
+
+/* ---------- QR code de la partie et scanner ---------- */
+.qrbox{background:#fff;padding:10px;border-radius:12px;width:min(220px,60vw);line-height:0}
+.qrbox svg{width:100%;height:auto;display:block}
+.scanbox{position:relative;width:100%;max-width:340px;aspect-ratio:1;margin:0 auto;border-radius:16px;overflow:hidden;background:#000}
+.scanbox video{width:100%;height:100%;object-fit:cover;display:block}
+.scanframe{position:absolute;inset:18%;border:3px solid var(--accent);border-radius:14px;box-shadow:0 0 0 999px rgba(0,0,0,.35)}
+
+/* ---------- Partie en ligne : à qui le tour ---------- */
+.turnbar{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:15px}
+.turnbar.me{border-color:var(--accent);color:var(--accent);font-weight:800}
+.turnbar span{color:var(--muted);font-size:13px;font-weight:600;white-space:nowrap}
+.gamebig{font:400 24px/1.1 var(--display);color:var(--accent)}
+/* Fléchettes sur l'écran : une ligne compacte au-dessus de la cible */
+.dstrip{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dstrip .dwho{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dleft{font:400 30px/1 var(--display);color:var(--accent);font-variant-numeric:tabular-nums}
+.dstrip .dslots{gap:4px}
+.dstrip .dslot{min-width:40px;padding:4px 6px;font-size:13px}

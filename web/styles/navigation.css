@@ -1,0 +1,39 @@
+/* Barre de navigation du bas et écran de chargement. */
+
+/* ---------- Barre de navigation (6 onglets, masquée pendant une partie) ---------- */
+#tabbar{flex:none}
+body.has-tabs #app{padding-bottom:24px}
+body.typing #tabbar{display:none} /* clavier ouvert : la barre se retire */
+.tabbar{position:relative;z-index:8;display:flex;justify-content:center;background:var(--surface);border-top:1px solid var(--line);padding:4px 6px max(6px,env(safe-area-inset-bottom,0px))}
+.tab{flex:1;min-width:0;max-width:96px;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;color:var(--muted);padding:6px 1px 2px;border-radius:12px;font-size:10.5px;font-weight:700;white-space:nowrap}
+.tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--accent)}
+.tab.on svg{stroke-width:2.2}
+.tab:active{background:var(--surface-2)}
+
+/* ---------- Écran de chargement : se retire dès que l'app est prête, et de lui-même au bout de 3 s au pire ---------- */
+#splash{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;animation:splashAuto .3s ease 3s forwards}
+#splash.done{opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s linear .35s}
+.splash-fan{position:relative;width:150px;height:130px}
+.splash-fan .card{position:absolute;left:50%;bottom:0;--cw:78px;margin-left:-39px;transform-origin:50% 115%;animation:fanOut .6s cubic-bezier(.2,.9,.3,1.15) both}
+.splash-fan .card:nth-child(1){--r:-16deg}
+.splash-fan .card:nth-child(2){--r:0deg;animation-delay:.08s}
+.splash-fan .card:nth-child(3){--r:16deg;animation-delay:.16s}
+.splash-title{font:400 44px/1 var(--display);color:var(--accent);animation:rise .5s ease .25s both}
+.splash-dots{display:flex;gap:6px}
+.splash-dots i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:blink 1s ease-in-out infinite}
+.splash-dots i:nth-child(2){animation-delay:.15s}
+.splash-dots i:nth-child(3){animation-delay:.3s}
+@keyframes fanOut{from{transform:rotate(0) translateY(20px);opacity:0}to{transform:rotate(var(--r));opacity:1}}
+@keyframes rise{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+@keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes splashAuto{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.splash-fan .card,.splash-title,.splash-dots i{animation:none}.splash-fan .card{transform:rotate(var(--r))}}
+
+/* ---------- Fenêtre de consentement à la mesure d'audience (js/core/analytics.js) ---------- */
+.consent{position:fixed;inset:0;z-index:30;background:rgba(10,6,12,.7);display:flex;align-items:center;justify-content:center;padding:16px}
+.consent .inner{width:100%;max-width:420px;max-height:calc(100dvh - 32px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,.5);padding:20px 18px;display:flex;flex-direction:column;gap:14px}
+.consent h2{font-size:18px}
+.consent p{margin:0;font-size:14px;color:var(--muted)}
+.consent a{color:var(--accent)}
+.consent .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}

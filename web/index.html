@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tournée</title>
+<meta name="description" content="Jeux de cartes de soirée : Palmier, Rivière, Purple, Autoroute, Pyramide, Ascenseur et Barbu.">
+<meta name="theme-color" content="#1b1321">
+
+<!-- Installation sur l'écran d'accueil -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/cards.css">
+<link rel="stylesheet" href="styles/navigation.css">
+<link rel="stylesheet" href="styles/pages.css">
+<link rel="stylesheet" href="styles/games.css">
+</head>
+<body>
+
+<!-- Écran de chargement (retiré par js/app.js) -->
+<div id="splash" aria-hidden="true">
+  <div class="splash-fan">
+    <div class="card back"></div>
+    <div class="card red"><span class="tl">R<br>♥</span><span class="pip">♥</span><span class="br">R<br>♥</span></div>
+    <div class="card"><span class="tl">A<br>♠</span><span class="pip">♠</span><span class="br">A<br>♠</span></div>
+  </div>
+  <div class="splash-title">Tournée</div>
+  <div class="splash-dots"><i></i><i></i><i></i></div>
+</div>
+
+<!-- L'app : la page courante (#app) et la barre de navigation (#tabbar) -->
+<div id="shell">
+  <div id="app"></div>
+  <div id="tabbar" hidden></div>
+</div>
+<div id="toast" class="toast" hidden></div>
+
+<!-- Ordre important : le socle, puis les jeux, puis les pages, puis le démarrage -->
+<script src="js/core/state.js"></script>
+<script src="js/core/cards.js"></script>
+<script src="js/core/settings.js"></script>
+<script src="js/core/card-rules.js"></script>
+<script src="js/core/screens.js"></script>
+<script src="js/core/analytics.js"></script>
+
+<script src="js/games/palmier.js"></script>
+<script src="js/games/riviere.js"></script>
+<script src="js/games/purple.js"></script>
+<script src="js/games/autoroute.js"></script>
+<script src="js/games/pyramide.js"></script>
+<script src="js/games/ascenseur.js"></script>
+<script src="js/games/barbu.js"></script>
+<script src="js/games/uno.js"></script>
+<script src="js/games/dartboard.js"></script>
+<script src="js/games/flechettes.js"></script>
+<script src="js/games/puissance4.js"></script>
+
+<script src="js/pages/home.js"></script>
+<script src="js/pages/players.js"></script>
+<script src="js/pages/settings.js"></script>
+<script src="js/pages/card-editor.js"></script>
+<script src="js/pages/shop.js"></script>
+<script src="js/pages/install.js"></script>
+<script src="vendor/qrcode.min.js"></script>
+<script src="js/online.js"></script>
+
+<script src="js/app.js"></script>
+</body>
+</html>

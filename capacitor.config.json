@@ -1,0 +1,9 @@
+{
+  "appId": "com.robintijou.tournee",
+  "appName": "Tournée",
+  "webDir": "web",
+  "android": {
+    "backgroundColor": "#1b1321",
+    "adjustMarginsForEdgeToEdge": "auto"
+  }
+}

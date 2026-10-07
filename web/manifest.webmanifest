@@ -1,0 +1,17 @@
+{
+  "name": "Tournée",
+  "short_name": "Tournée",
+  "description": "Jeux de cartes de soirée : Palmier, Rivière, Purple, Autoroute, Pyramide, Ascenseur et Barbu.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1b1321",
+  "theme_color": "#1b1321",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
