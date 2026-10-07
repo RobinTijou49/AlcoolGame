@@ -15,7 +15,7 @@ function render() {
   tabbarEl.innerHTML = tabs ? tabbarHTML() : '';
   tabbarEl.hidden = !tabs;
   app.innerHTML = SCREENS[S.screen]() + (S.sheet ? sheetHTML() : '') + (INSTALL.help ? installHTML() : '') +
-    (inGame && S.history.length ? '<button class="undo" data-act="undo">↶ Annuler</button>' : '') + consentHTML();
+    (inGame && S.history.length ? '<button class="undo" data-act="undo">↶ Annuler</button>' : '') + accountHTML() + consentHTML();
   MOUNT[S.screen]?.();
   trackScreen();
   // Sauvegarde de la partie en cours (y compris quand on regarde ses réglages ou ses cartes), reprise au prochain lancement
@@ -91,7 +91,7 @@ document.addEventListener('click', e => {
   keepAwake();
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && (S.sheet || INSTALL.help)) { S.sheet = false; INSTALL.help = false; render(); }
+  if (e.key === 'Escape' && (S.sheet || INSTALL.help || ACC.open)) { S.sheet = false; INSTALL.help = false; ACC.open = false; render(); }
 });
 // Pendant la saisie (clavier ouvert), la barre de navigation se retire pour ne pas flotter au-dessus du clavier
 document.addEventListener('focusin', e => { if (e.target.matches('input, textarea')) document.body.classList.add('typing'); });

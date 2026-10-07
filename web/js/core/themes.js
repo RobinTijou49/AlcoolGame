@@ -1,4 +1,4 @@
-// Thème de la soirée (onglet À boire) : Soft, Normal, Hard ou Hot (premium, réservé aux adultes).
+// Thème de la soirée (onglet À boire) : Soft, Normal, Hard ou Hot (premium, réservé aux adultes ; payant quand HOT_PAID est vrai).
 // Il change le contenu des jeux : phrases de Je n'ai jamais, défis et questions d'Action ou vérité, actions des cartes
 // du Palmier et du Barbu. Les gorgées des autres jeux ne changent pas.
 
@@ -72,6 +72,7 @@ Object.assign(A, {
   setTheme(id) {
     if (!THEMES.some(t => t.id === id)) return;
     if (id === 'hot' && !store.get('adult', false)) { S.hotAsk = true; render(); return; }
+    if (id === 'hot' && HOT_PAID && !buy('hot', 'Thème Hot')) return; // payant : il faut l'avoir acheté (core/account.js)
     S.theme = id; S.hotAsk = false; store.set('theme', id);
     S.rules = { palmier: loadRules('palmier'), barbu: loadRules('barbu') };
     render(); track('theme_change', { theme: id });

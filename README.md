@@ -123,6 +123,7 @@ Pour l'activer :
 | `game_start` / `game_end` / `game_restart` | Partie lancée / quittée / relancée sur un téléphone | `game`, `players`, `duration_sec` |
 | `online_create` / `online_join` / `online_start` | Jeu en ligne | `method` (qr, lien, code), `game`, `players` |
 | `setting_change` | Réglage modifié | `game`, `setting` |
+| `login` | Connexion au compte | `method` (google, email) |
 | `theme_change` | Thème de la soirée choisi | `theme` (soft, normal, hard, hot) |
 | `skin_use` / `skin_interest` | Skin activé / skin premium touché | `skin` |
 | `install` | Bouton « Installer l'app » (Android) | `outcome` |
@@ -131,6 +132,27 @@ Pour l'activer :
 
 Propriété utilisateur `app_mode` : `installee` (écran d'accueil), `site` ou `android`. Pour voir les détails dans les rapports,
 les déclarer dans Admin → Définitions personnalisées (dimensions `game`, `method`, `setting`, `skin`, `theme`, `app_mode` ; métrique `duration_sec`).
+
+## Compte et achats (site)
+
+`web/js/core/account.js` : compte **facultatif**, proposé seulement pour acheter (thème Hot, skins premium) ou
+« Restaurer mes achats » sur un autre navigateur ou téléphone. Connexion **Google** ou **lien par e-mail** (sans mot de passe),
+via Firebase Authentication, chargé seulement quand on ouvre la fenêtre du compte. Pas de compte dans l'app Android
+(les achats y passeront par Google Play Billing).
+
+Les achats sont dans la base Firebase : `users/<uid>/owned/<article>` = `true` (`hot`, `neon`, `or`…). Chacun ne peut lire
+que les siens, et **personne ne peut les écrire depuis l'app** : seul le futur serveur de paiement (Stripe) les ajoutera.
+Tant que `apiKey` est vide, aucun bouton de compte n'apparaît.
+
+Pour l'activer :
+1. Console Firebase → **Paramètres du projet** → Vos applications → ajouter une app **Web** (</>) → copier `apiKey` et `appId`
+   dans `FIREBASE_CONFIG` en haut de `web/js/core/account.js` (ce n'est pas secret).
+2. **Authentication** → Commencer → Mode de connexion : activer **Google**, et **E-mail/Mot de passe** avec l'option
+   **Lien envoyé par e-mail (connexion sans mot de passe)**.
+3. Authentication → Paramètres → **Domaines autorisés** : ajouter l'adresse du site Netlify (ex. `ton-site.netlify.app`).
+4. **Realtime Database** → Règles : coller le contenu de `database.rules.json`, puis Publier.
+
+Le thème Hot devient payant en passant `HOT_PAID` à `true` dans `account.js` (il reste gratuit en attendant).
 
 ## App Android
 

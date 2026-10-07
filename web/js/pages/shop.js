@@ -1,7 +1,6 @@
 // Onglet « Boutique » : skins de cartes (couleurs de la face et du dos).
-// price : null = gratuit, sinon prix affiché. Les skins payants ne peuvent pas encore être achetés :
-// il faudra brancher un paiement vérifié par un serveur (Stripe pour le site, Google Play Billing pour l'app Android),
-// qui ajoutera le skin à « ownedSkins ». Un déblocage fait uniquement sur le téléphone serait trop facile à contourner.
+// price : null = gratuit, sinon prix affiché. Un skin payant est possédé quand il est dans les achats du compte
+// (core/account.js), écrits par le serveur de paiement. Un déblocage fait uniquement sur le téléphone serait trop facile à contourner.
 
 const SKINS = [
   { id: 'classique', name: 'Classique', desc: 'Le dos aubergine et laiton de Tournée.', price: null,
@@ -26,8 +25,7 @@ const SKINS = [
     face: '#0e0b14', ink: '#7df9ff', red: '#ff4fd8', edge: '#ff4fd8', backEdge: '#7df9ff',
     back: 'linear-gradient(rgba(125,249,255,.35) 1px,transparent 1px) 0 0/10px 10px,linear-gradient(90deg,rgba(255,79,216,.35) 1px,transparent 1px) 0 0/10px 10px,#0e0b14' }
 ];
-const ownedSkins = new Set(store.get('ownedSkins', []));
-const ownsSkin = s => !s.price || ownedSkins.has(s.id);
+const ownsSkin = s => !s.price || owns(s.id);
 const skinVars = s => `--face:${s.face};--face-ink:${s.ink};--face-red:${s.red};--face-edge:${s.edge};--back:${s.back};--back-edge:${s.backEdge}`;
 
 // Applique le skin choisi à toutes les cartes de l'app (variables CSS de cards.css)
@@ -54,7 +52,8 @@ SCREENS.shop = function () {
         <div class="skin-act">${action}</div>
       </div>`;
     }).join('')}</div>
-    <p class="muted" style="margin:0;font-size:13.5px;text-align:center">Les skins premium seront bientôt disponibles à l’achat.</p>`;
+    <p class="muted" style="margin:0;font-size:13.5px;text-align:center">Les skins premium seront bientôt disponibles à l’achat.${ACC.on ? ' Ils seront liés à ton compte, pour les retrouver sur tous tes appareils.' : ''}</p>
+    ${accountButtonHTML()}`;
 };
 
 Object.assign(A, {
@@ -67,6 +66,6 @@ Object.assign(A, {
   buySkin(id) {
     const s = SKINS.find(x => x.id === id);
     track('skin_interest', { skin: id }); // skin premium touché : mesure l'envie d'acheter
-    toast(`« ${s.name} » sera bientôt disponible à l’achat`);
+    if (buy(id, s.name)) A.useSkin(id);
   }
 });

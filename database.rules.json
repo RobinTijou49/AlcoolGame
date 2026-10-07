@@ -6,6 +6,12 @@
         ".write": "$code.matches(/^[A-HJ-NP-Z]{4}$/)",
         ".validate": "!newData.exists() || newData.child('created').isNumber()"
       }
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": false
+      }
     }
   }
 }

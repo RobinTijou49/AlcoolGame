@@ -40,6 +40,7 @@ SCREENS.settings = function () {
       ${AN.on ? `<div class="opt"><span class="olabel">Mesure d’audience (Google Analytics, sans prénom)</span>
         <div class="chips"><button class="chip pick" data-act="consent" data-arg="1" aria-pressed="${AN.consent === true}">Activée</button>
           <button class="chip pick" data-act="consent" data-arg="0" aria-pressed="${AN.consent !== true}">Désactivée</button></div></div>` : ''}
+      ${ACC.on ? `<div class="opt"><span class="olabel">Compte (facultatif, seulement pour les achats)</span>${accountButtonHTML()}</div>` : ''}
       ${EMBEDDED ? '' : '<a class="muted" style="font-size:14px" href="confidentialite.html">Politique de confidentialité</a>'}
     </section>`}`;
 };

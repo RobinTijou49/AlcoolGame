@@ -37,3 +37,5 @@ body.typing #tabbar{display:none} /* clavier ouvert : la barre se retire */
 .consent p{margin:0;font-size:14px;color:var(--muted)}
 .consent a{color:var(--accent)}
 .consent .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.consent input{width:100%}
+.consent .acc-err{margin:0;font-size:14px;color:var(--bad)}
