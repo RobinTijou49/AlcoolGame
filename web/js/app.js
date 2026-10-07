@@ -26,7 +26,7 @@ function render() {
 
 // ---------- Actions générales ----------
 Object.assign(A, {
-  // « ← Jeux » : retour à l'onglet du jeu en cours (Cartes, qui contient aussi les jeux d'ambiance, ou Plateau)
+  // « ← Jeux » : retour à l'onglet du jeu en cours (À boire ou Loisirs)
   home() { const t = GAMES.find(x => x.id === S.screen)?.tab; A.tab(t === 'board' ? 'board' : 'home'); },
   // Onglets : quitter une partie ou les réglages d'un jeu ramène à la navigation principale
   tab(id) {

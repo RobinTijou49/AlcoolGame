@@ -17,7 +17,8 @@ const ACTION_GAME = {};      // action → jeu auquel elle appartient (pour les 
 const CTX = { online: false, me: null, silent: false };
 
 // Déclare un jeu : sa tuile, sa mise en place, son écran et ses actions.
-//   tab : où il apparaît : 'home' (jeux de cartes, par défaut), 'party' (jeux d'ambiance, sous les jeux de cartes) ou 'board' (jeux de plateau)
+//   tab : où il apparaît : onglet « À boire » avec 'home' (jeux de cartes, par défaut) ou 'party' (sans cartes),
+//         ou onglet « Loisirs » avec 'board' (jeux sans alcool)
 //   min : nombre minimum de joueurs (2 par défaut)
 //   mount : facultatif, appelé après chaque affichage de l'écran (dessin sur un canvas, etc.)
 //   turnOf(g) : en ligne, le joueur qui a la main (seul lui peut agir) ; null = tout le monde
@@ -61,14 +62,14 @@ const pageTop = title => `<h1 class="pagetitle">${title}</h1>`;
 
 // ---------- Barre de navigation : 6 onglets en bas de l'écran (masqués pendant une partie) ----------
 const ICONS = {
-  home: '<rect x="3.5" y="5" width="11" height="15" rx="2"/><path d="M14.5 7.2l4.3 1.2a1.6 1.6 0 0 1 1.1 2l-2.6 9.4"/>',
+  home: '<path d="M6 4h12l-1.5 15.3a1.6 1.6 0 0 1-1.6 1.4H9.1a1.6 1.6 0 0 1-1.6-1.4z"/><path d="M6.6 9.5h10.8"/>',
   board: '<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.3"/><circle cx="15" cy="9" r="1.3"/><circle cx="9" cy="15" r="1.3"/><circle cx="15" cy="15" r="1.3"/>',
   players: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c.6-3.4 3-5.4 6-5.4s5.4 2 6 5.4"/><circle cx="17" cy="9" r="2.5"/><path d="M16.6 14.2c2.4.2 3.9 1.9 4.4 4.8"/>',
   lobby: '<rect x="3" y="6" width="7.5" height="13" rx="1.6"/><rect x="13.5" y="6" width="7.5" height="13" rx="1.6"/><path d="M10.5 12.5h3"/>',
   shop: '<path d="M5 8.5h14l-1.2 11.5H6.2z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/>',
   settings: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>'
 };
-const TABS = [['home', 'Cartes'], ['board', 'Plateau'], ['players', 'Joueurs'], ['lobby', 'En ligne'], ['shop', 'Boutique'], ['settings', 'Réglages']];
+const TABS = [['home', 'À boire'], ['board', 'Loisirs'], ['players', 'Joueurs'], ['lobby', 'En ligne'], ['shop', 'Boutique'], ['settings', 'Réglages']];
 // La barre s'affiche sur les pages des onglets, sauf les réglages ouverts depuis un jeu
 const isTab = () => TABS.some(([id]) => id === S.screen) && !(S.screen === 'settings' && S.setBack);
 function tabbarHTML() {

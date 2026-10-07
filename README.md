@@ -1,9 +1,9 @@
 # Tournée
 
 Jeux de soirée sur téléphone.
-- **Cartes** : Palmier, Rivière, Purple, Autoroute, Pyramide, Ascenseur et Barbu.
-- **Ambiance** (sans cartes, dans l'onglet Cartes) : Je n'ai jamais, Action ou vérité. Les phrases sont dans `web/js/games/jamais.js` et `aov.js`.
-- **Plateau** (jeux normaux, sans alcool) : Uno, Fléchettes (on lance la fléchette d’un geste vers la cible) et Puissance 4.
+- **À boire** : les jeux de cartes (Palmier, Rivière, Purple, Autoroute, Pyramide, Ascenseur, Barbu) et sans cartes
+  (Je n'ai jamais, Action ou vérité, dont les phrases sont dans `web/js/games/jamais.js` et `aov.js`).
+- **Loisirs** (jeux sans alcool) : Uno, Fléchettes (on lance la fléchette d’un geste vers la cible) et Puissance 4.
 
 Tous les jeux se jouent sur un seul téléphone ou en ligne, chacun sur son téléphone (QR code pour rejoindre).
 
@@ -19,7 +19,7 @@ AlcG/
 │   │   ├── base.css          Couleurs, polices, mise en page, boutons, champs, fenêtres
 │   │   ├── cards.css         Les cartes à jouer (face, dos, tailles, animation)
 │   │   ├── navigation.css    Barre de navigation du bas et écran de chargement
-│   │   ├── pages.css         Onglets Cartes, Plateau, Joueurs, Réglages, Boutique, éditeur de cartes
+│   │   ├── pages.css         Onglets À boire, Loisirs, Joueurs, Réglages, Boutique, éditeur de cartes
 │   │   └── games.css         Écrans de jeu, un bloc par jeu
 │   ├── js/
 │   │   ├── core/             Le socle partagé
@@ -51,7 +51,7 @@ AlcG/
 - **Un texte, une règle ou un comportement d'un jeu** : `web/js/games/<jeu>.js`. Chaque jeu est déclaré avec `defineGame({...})` :
   `init` crée une nouvelle partie, `screen` renvoie le HTML de l'écran, `actions` contient ce que font ses boutons.
 - **Ajouter un jeu** : créer `web/js/games/mon-jeu.js` sur le modèle d'un jeu existant, puis l'ajouter dans la liste des scripts de `web/index.html`
-  (après les autres jeux). Il apparaît tout seul dans son onglet : `tab: 'home'` pour Cartes, `tab: 'board'` pour Plateau.
+  (après les autres jeux). Il apparaît tout seul dans son onglet : `tab: 'home'` (À boire, jeux de cartes), `tab: 'party'` (À boire, sans cartes) ou `tab: 'board'` (Loisirs).
 - **Un réglage** : `web/js/core/settings.js` (la liste), puis `cfg('jeu', 'réglage')` pour lire sa valeur dans le jeu.
 - **Les couleurs** : variables en haut de `web/styles/base.css`. **Un skin de cartes** : liste `SKINS` de `web/js/pages/shop.js`.
 - **Les boutons** fonctionnent tous pareil : `<button data-act="nomAction" data-arg="paramètre">` appelle `A.nomAction(paramètre)`.

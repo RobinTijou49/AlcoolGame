@@ -193,7 +193,7 @@ SCREENS.online = function () {
         <ol class="plist">${ps.map(p => `<li class="prow-item"><span class="pn" style="padding:8px">${esc(p.name)}${p.id === PID ? ' (toi)' : ''}</span>${p.id === R.host ? '<span class="star on">hôte</span>' : ''}</li>`).join('')}</ol></div>
       <div class="section"><span class="label">${isHost() ? 'Choisis le jeu' : 'Jeu choisi par l’hôte'}</span>
         ${isHost()
-          ? ['home', 'party', 'board'].map(tab => `<div class="chips">${GAMES.filter(x => x.tab === tab).map(x =>
+          ? [['À boire', ['home', 'party']], ['Loisirs', ['board']]].map(([lbl, tabs]) => `<span class="label">${lbl}</span><div class="chips">${GAMES.filter(x => tabs.includes(x.tab)).map(x =>
               `<button class="chip pick" data-act="onlinePickGame" data-arg="${x.id}" aria-pressed="${R.game === x.id}">${x.suit} ${x.name}</button>`).join('')}</div>`).join('')
           : `<div class="panel" style="text-align:center"><b class="gamebig">${esc(title)}</b></div>`}
       </div>

@@ -1,4 +1,4 @@
-// Onglets « Cartes » (accueil, avec aussi les jeux d'ambiance) et « Plateau » : qui joue, puis la grille des jeux de l'onglet.
+// Onglets « À boire » (accueil : tous les jeux où l'on boit, avec ou sans cartes) et « Loisirs » (jeux sans alcool) : qui joue, puis la grille des jeux de l'onglet.
 
 // Carte « Joueurs » : résumé de qui joue et qui commence, mène à l'onglet Joueurs
 function whoHTML() {
@@ -27,18 +27,18 @@ function gamesHTML(tab, title) {
 SCREENS.home = function () {
   return `
     <div class="brand">
-      <div><h1>Tournée</h1><p>Les jeux de cartes de soirée, sans paquet ni arbitre.</p></div>
+      <div><h1>Tournée</h1><p>Les jeux à boire de soirée, sans paquet ni arbitre.</p></div>
       <div class="fan" aria-hidden="true">${cardHTML({ v: 1, s: '♠', red: false, sn: 'pique' })}${cardHTML({ v: 13, s: '♥', red: true, sn: 'cœur' })}${cardHTML({ v: 7, s: '♦', red: true, sn: 'carreau' })}</div>
     </div>
     ${canOfferInstall() ? `<button class="banner" data-act="install">${SHARE_ICON}<span><b>Installe Tournée</b> sur ton écran d’accueil pour l’ouvrir comme une app.</span></button>` : ''}
     ${whoHTML()}
-    ${gamesHTML('home', 'Choisis un jeu de cartes')}
-    ${gamesHTML('party', 'Jeux d’ambiance, sans cartes')}`;
+    ${gamesHTML('home', 'Jeux de cartes')}
+    ${gamesHTML('party', 'Sans cartes')}`;
 };
 
 SCREENS.board = function () {
-  return `${pageTop('Plateau')}
-    <p class="muted" style="margin:0;font-size:14px">Les jeux de table, sans plateau ni feuille de score : le téléphone tient les comptes.</p>
+  return `${pageTop('Loisirs')}
+    <p class="muted" style="margin:0;font-size:14px">Les jeux sans alcool, sans plateau ni feuille de score : le téléphone tient les comptes.</p>
     ${whoHTML()}
-    ${gamesHTML('board', 'Choisis un jeu')}`;
+    ${gamesHTML('board', 'Jeux sans alcool')}`;
 };
