@@ -121,15 +121,19 @@ function buy(id, name) {
     ACC.then = () => buy(id, name); // une fois connecté, on reprend l'achat
     return false;
   }
-  checkout(id);
+  // Avant de payer : acceptation des CGV et renonciation au droit de rétractation (contenu livré tout de suite)
+  ACC.item = { id, name, price: itemPrice(id) };
+  ACC.open = true; ACC.step = 'consent'; ACC.error = ''; ACC.busy = false;
+  render();
   return false;
 }
+const itemPrice = id => (id === 'hot' ? HOT_PRICE : SKINS.find(s => s.id === id)?.price || '');
 // Envoie vers la page de paiement Stripe ; au retour, l'app revient avec ?paid=<article>
 async function checkout(id) {
   toast('Ouverture du paiement…');
   try {
     const token = await (await loadAuth()).currentUser.getIdToken();
-    const r = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item: id, token }) });
+    const r = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item: id, token, consent: true }) });
     const data = await r.json().catch(() => ({}));
     if (!r.ok || !data.url) throw new Error(data.error || 'network');
     track('begin_checkout', { item: id });
@@ -164,6 +168,11 @@ Object.assign(A, {
     render();
   },
   accClose() { ACC.open = false; ACC.then = null; render(); },
+  accPay() {
+    if (!document.getElementById('acc-consent')?.checked) { ACC.error = 'Coche la case pour continuer.'; render(); return; }
+    ACC.busy = true; render();
+    checkout(ACC.item.id).finally(() => { ACC.busy = false; ACC.open = false; render(); });
+  },
   accGoogle() {
     if (!ACC.ready) return;
     ACC.error = ''; ACC.busy = true; render();
@@ -216,7 +225,16 @@ function accountHTML() {
   const err = ACC.error ? `<p class="acc-err" role="alert">${esc(ACC.error)}</p>` : '';
   const close = `<button class="btn ghost" data-act="accClose">Fermer</button>`;
   let body;
-  if (ACC.step === 'me' && ACC.user) {
+  if (ACC.step === 'consent' && ACC.item) {
+    const it = ACC.item;
+    body = `<p style="margin:0">${esc(it.name)} · <b>${esc(it.price)}</b>, paiement unique</p>
+      <p class="muted" style="margin:0;font-size:14px">Débloqué tout de suite sur le compte ${esc(ACC.user?.email || '')}, et sur tous tes appareils.</p>
+      <label class="acc-check"><input type="checkbox" id="acc-consent">
+        <span>J’accepte les <a href="cgv.html" target="_blank" rel="noopener">conditions générales de vente</a> et je demande la livraison immédiate du contenu. Je renonce ainsi à mon droit de rétractation de 14 jours.</span></label>
+      ${err}
+      <button class="btn primary" data-act="accPay" ${ACC.busy ? 'disabled' : ''}>${ACC.busy ? 'Ouverture du paiement…' : `Payer ${esc(it.price)}`}</button>
+      ${close}`;
+  } else if (ACC.step === 'me' && ACC.user) {
     const list = [...ACC.owned].map(itemName);
     body = `<p style="margin:0">Connecté avec <b>${esc(ACC.user.email)}</b></p>
       <p class="muted" style="margin:0;font-size:14px">${list.length ? `Tes achats : ${list.map(esc).join(', ')}.` : 'Aucun achat sur ce compte pour l’instant.'}</p>
@@ -243,7 +261,7 @@ function accountHTML() {
       ${close}`;
   }
   return `<div class="consent"><div class="inner" role="dialog" aria-modal="true" aria-labelledby="acc-title">
-    <h2 id="acc-title">${ACC.step === 'me' ? 'Mon compte' : 'Compte Tournée'}</h2>${body}</div></div>`;
+    <h2 id="acc-title">${ACC.step === 'me' ? 'Mon compte' : ACC.step === 'consent' ? 'Acheter' : 'Compte Tournée'}</h2>${body}</div></div>`;
 }
 
 // Bouton d'accès au compte (Boutique, Réglages)

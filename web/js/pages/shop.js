@@ -54,7 +54,8 @@ SCREENS.shop = function () {
     }).join('')}</div>
     ${PAY.test ? '<p class="paytest">Mode test des paiements : rien n’est débité. Carte 4242 4242 4242 4242, date future, n’importe quel code.</p>' : ''}
     <p class="muted" style="margin:0;font-size:13.5px;text-align:center">${PAY.on ? 'Les achats sont liés à ton compte, pour les retrouver sur tous tes appareils.' : `Les skins premium seront bientôt disponibles à l’achat.${ACC.on ? ' Ils seront liés à ton compte, pour les retrouver sur tous tes appareils.' : ''}`}</p>
-    ${accountButtonHTML()}`;
+    ${accountButtonHTML()}
+    ${PAY.on ? '<p class="muted" style="margin:0;font-size:13px;text-align:center"><a class="muted" href="cgv.html">Conditions de vente</a> · <a class="muted" href="mentions-legales.html">Mentions légales</a></p>' : ''}`;
 };
 
 Object.assign(A, {
