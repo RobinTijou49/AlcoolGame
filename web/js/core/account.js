@@ -111,6 +111,8 @@ const HOT_PRICE = '2,99 €';
 const PAY = { on: ACC.on && (PAY_LIVE || store.get('paytest', false)), test: !PAY_LIVE && store.get('paytest', false) };
 // Le thème Hot est payant dès que la vente est ouverte (ou en mode test) ; gratuit sinon
 const hotPaid = () => PAY.on;
+// Hot choisi quand il était gratuit, sans l'avoir acheté : on revient au thème Normal
+if (hotPaid() && S.theme === 'hot' && !owns('hot')) { S.theme = 'normal'; store.set('theme', 'normal'); S.rules = { palmier: loadRules('palmier'), barbu: loadRules('barbu') }; }
 
 // Achat d'un article : il faut un compte, pour que l'achat suive la personne sur tous ses appareils
 function buy(id, name) {
