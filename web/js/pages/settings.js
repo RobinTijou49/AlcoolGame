@@ -23,7 +23,7 @@ SCREENS.settings = function () {
     return `<section class="setsec" id="set-${id}">
       <div class="row spread"><h3 class="sechead">${def.name}</h3>
         ${changed ? `<button class="iconbtn" data-act="resetSettings" data-arg="${id}">Par défaut</button>` : ''}</div>
-      ${id === 'general' ? '<p class="muted" style="margin:0;font-size:14px">Pour tous les jeux qui comparent des cartes : Rivière, Autoroute et Ascenseur.</p>' : ''}
+      ${def.desc ? `<p class="muted" style="margin:0;font-size:14px">${def.desc}</p>` : ''}
       ${opts}
       ${def.cards ? `<button class="btn" data-act="editor" data-arg="${id}">Modifier l’action de chaque carte</button>` : ''}
     </section>`;

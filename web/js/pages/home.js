@@ -1,4 +1,4 @@
-// Onglets « Cartes » (accueil) et « Plateau » : qui joue, puis la grille des jeux de l'onglet.
+// Onglets « Cartes » (accueil, avec aussi les jeux d'ambiance) et « Plateau » : qui joue, puis la grille des jeux de l'onglet.
 
 // Carte « Joueurs » : résumé de qui joue et qui commence, mène à l'onglet Joueurs
 function whoHTML() {
@@ -32,7 +32,8 @@ SCREENS.home = function () {
     </div>
     ${canOfferInstall() ? `<button class="banner" data-act="install">${SHARE_ICON}<span><b>Installe Tournée</b> sur ton écran d’accueil pour l’ouvrir comme une app.</span></button>` : ''}
     ${whoHTML()}
-    ${gamesHTML('home', 'Choisis un jeu de cartes')}`;
+    ${gamesHTML('home', 'Choisis un jeu de cartes')}
+    ${gamesHTML('party', 'Jeux d’ambiance, sans cartes')}`;
 };
 
 SCREENS.board = function () {

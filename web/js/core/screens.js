@@ -17,7 +17,7 @@ const ACTION_GAME = {};      // action → jeu auquel elle appartient (pour les 
 const CTX = { online: false, me: null, silent: false };
 
 // Déclare un jeu : sa tuile, sa mise en place, son écran et ses actions.
-//   tab : onglet où il apparaît, 'home' (jeux de cartes, par défaut) ou 'board' (jeux de plateau)
+//   tab : où il apparaît : 'home' (jeux de cartes, par défaut), 'party' (jeux d'ambiance, sous les jeux de cartes) ou 'board' (jeux de plateau)
 //   min : nombre minimum de joueurs (2 par défaut)
 //   mount : facultatif, appelé après chaque affichage de l'écran (dessin sur un canvas, etc.)
 //   turnOf(g) : en ligne, le joueur qui a la main (seul lui peut agir) ; null = tout le monde
@@ -47,7 +47,7 @@ function header(title, sips = true) {
   if (CTX.online) return ''; // en ligne, l'écran de la partie a sa propre barre (Quitter, code)
   return `<div class="top">
     <button class="iconbtn" data-act="home" aria-label="Retour aux jeux">← Jeux</button>
-    <h2>${title}</h2>
+    <h2 class="${title.length > 11 ? 'long' : ''}">${title}</h2>
     ${sips ? '<button class="iconbtn" data-act="sheet">Compteur</button>' : '<span class="iconbtn" style="visibility:hidden" aria-hidden="true">← Jeux</span>'}
   </div>`;
 }

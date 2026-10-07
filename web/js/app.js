@@ -26,8 +26,8 @@ function render() {
 
 // ---------- Actions générales ----------
 Object.assign(A, {
-  // « ← Jeux » : retour à l'onglet du jeu en cours (Cartes ou Plateau)
-  home() { A.tab(GAMES.find(x => x.id === S.screen)?.tab || 'home'); },
+  // « ← Jeux » : retour à l'onglet du jeu en cours (Cartes, qui contient aussi les jeux d'ambiance, ou Plateau)
+  home() { const t = GAMES.find(x => x.id === S.screen)?.tab; A.tab(t === 'board' ? 'board' : 'home'); },
   // Onglets : quitter une partie ou les réglages d'un jeu ramène à la navigation principale
   tab(id) {
     if (O.scanning) stopScan(); // on quitte l'onglet En ligne : la caméra s'éteint
@@ -66,13 +66,29 @@ function act(name, arg, el, e) {
   fn(arg, el, e);
 }
 
+// Garde l'écran allumé pendant la soirée (réglage Téléphone). Le téléphone relâche le verrou quand on change d'app :
+// on le redemande au retour, et à chaque bouton touché (certains navigateurs l'exigent).
+let wakeLock = null;
+function keepAwake() {
+  if (!navigator.wakeLock || document.hidden) return;
+  if (!cfg('phone', 'awake')) { if (wakeLock?.release) wakeLock.release().catch(() => {}); wakeLock = null; return; }
+  if (wakeLock) return;
+  wakeLock = 'pending';
+  navigator.wakeLock.request('screen').then(l => {
+    wakeLock = l;
+    l.addEventListener('release', () => { if (wakeLock === l) wakeLock = null; });
+  }).catch(() => (wakeLock = null));
+}
+document.addEventListener('visibilitychange', keepAwake);
+
 // Tous les boutons passent par ici : data-act="action" data-arg="paramètre"
-let wake = false;
 document.addEventListener('click', e => {
-  // Garde l'écran allumé pendant la soirée (si le téléphone le permet)
-  if (!wake && navigator.wakeLock) { wake = true; navigator.wakeLock.request('screen').catch(() => {}); }
   const el = e.target.closest('[data-act]');
-  if (el) act(el.dataset.act, el.dataset.arg, el, e);
+  if (el) {
+    if (GAME_SCREENS.has(S.screen) || S.screen === 'online') buzz(12); // petit retour au doigt dans les jeux
+    act(el.dataset.act, el.dataset.arg, el, e);
+  }
+  keepAwake();
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && (S.sheet || INSTALL.help)) { S.sheet = false; INSTALL.help = false; render(); }

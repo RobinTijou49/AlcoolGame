@@ -35,6 +35,12 @@ function drink(name, n) {
   if (CTX.online && name !== CTX.me) return; // en ligne, chaque téléphone ne compte que les gorgées de son joueur
   S.sips[name] = (S.sips[name] || 0) + n;
   save();
+  buzz([70, 50, 70]);
+}
+// Vibration du téléphone (réglage Téléphone → Vibrations). Sans effet sur iPhone, qui ne la permet pas aux sites.
+function buzz(pattern) {
+  if (!cfg('phone', 'vibrate')) return;
+  try { navigator.vibrate?.(pattern); } catch {}
 }
 
 let toastT;

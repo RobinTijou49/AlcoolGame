@@ -2,7 +2,12 @@
 // Chaque option : soit des choix [valeur, libellé], soit un nombre entre num[0] et num[1].
 
 const SETTINGS = {
-  general: { name: 'Général', opts: [
+  // Propres à chaque téléphone (local) : jamais copiés depuis l'hôte en ligne
+  phone: { name: 'Téléphone', local: true, desc: 'Propre à ce téléphone, même pendant une partie en ligne.', opts: [
+    { key: 'awake', label: 'Garder l’écran allumé pendant la soirée', choices: [[true, 'oui'], [false, 'non']], def: true },
+    { key: 'vibrate', label: 'Vibrer quand on doit boire et à chaque bouton d’un jeu (pas sur iPhone)', choices: [[true, 'oui'], [false, 'non']], def: true }
+  ] },
+  general: { name: 'Général', desc: 'Pour tous les jeux qui comparent des cartes : Rivière, Autoroute et Ascenseur.', opts: [
     { key: 'asHigh', label: 'L’As est', choices: [[true, 'la carte la plus forte'], [false, 'la carte la plus faible']], def: true },
     { key: 'tie', label: 'Une égalité (plus ou moins, intérieur ou extérieur)', choices: [['lose', 'compte comme une erreur'], ['win', 'compte comme une bonne réponse']], def: 'lose' }
   ] },
@@ -39,13 +44,22 @@ const SETTINGS = {
     { key: 'start', label: 'Score de départ', choices: [[301, '301'], [501, '501'], [701, '701']], def: 501 },
     { key: 'doubleOut', label: 'Pour finir pile à zéro, il faut toucher', choices: [[false, 'n’importe quelle case'], [true, 'un double ou le Bull']], def: false },
     { key: 'skill', label: 'Précision du lancer sur l’écran', choices: [['easy', 'facile'], ['normal', 'normale'], ['hard', 'difficile']], def: 'normal' }
+  ] },
+  // Jeux d'ambiance (sans cartes)
+  jamais: { name: 'Je n’ai jamais', opts: [
+    { key: 'level', label: 'Questions', choices: [['soft', 'tranquilles'], ['all', 'tranquilles et épicées']], def: 'soft' },
+    { key: 'sips', label: 'Gorgées pour ceux qui l’ont déjà fait', num: [1, 3], def: 1 }
+  ] },
+  aov: { name: 'Action ou vérité', opts: [
+    { key: 'level', label: 'Défis et questions', choices: [['soft', 'tranquilles'], ['all', 'tranquilles et épicés']], def: 'soft' },
+    { key: 'refuse', label: 'Gorgées si on refuse', num: [1, 5], def: 2 }
   ] }
 };
 S.set = store.get('settings', {});
 
 // Valeur d'un réglage. En ligne, tout le monde joue avec les réglages de l'hôte, copiés dans la partie au lancement.
 function cfg(game, key) {
-  const snap = (CTX.online || S.screen === 'online') && O.room?.state?.cfg;
+  const snap = !SETTINGS[game].local && (CTX.online || S.screen === 'online') && O.room?.state?.cfg;
   if (snap && snap[`${game}_${key}`] !== undefined) return snap[`${game}_${key}`];
   const v = S.set[game]?.[key];
   return v === undefined ? SETTINGS[game].opts.find(o => o.key === key).def : v;
@@ -53,7 +67,7 @@ function cfg(game, key) {
 // Copie de tous les réglages, envoyée aux autres téléphones au lancement d'une partie en ligne
 function cfgSnapshot() {
   const out = {};
-  for (const g in SETTINGS) for (const o of SETTINGS[g].opts) out[`${g}_${o.key}`] = cfg(g, o.key);
+  for (const g in SETTINGS) if (!SETTINGS[g].local) for (const o of SETTINGS[g].opts) out[`${g}_${o.key}`] = cfg(g, o.key);
   return out;
 }
 

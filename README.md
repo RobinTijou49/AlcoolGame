@@ -2,6 +2,7 @@
 
 Jeux de soirée sur téléphone.
 - **Cartes** : Palmier, Rivière, Purple, Autoroute, Pyramide, Ascenseur et Barbu.
+- **Ambiance** (sans cartes, dans l'onglet Cartes) : Je n'ai jamais, Action ou vérité. Les phrases sont dans `web/js/games/jamais.js` et `aov.js`.
 - **Plateau** (jeux normaux, sans alcool) : Uno, Fléchettes (on lance la fléchette d’un geste vers la cible) et Puissance 4.
 
 Tous les jeux se jouent sur un seul téléphone ou en ligne, chacun sur son téléphone (QR code pour rejoindre).
@@ -151,6 +152,9 @@ npm run android
 
 Android Studio s'ouvre : choisir le téléphone en haut, puis ▶. Après chaque modification de `web/`, relancer `npm run android`.
 
+**Vibrations** : après `npm run android:init`, ajouter une fois dans `android/app/src/main/AndroidManifest.xml`, à côté de la ligne
+`INTERNET` : `<uses-permission android:name="android.permission.VIBRATE" />`. Sans elle, l'app Android ne vibre pas (le site, si).
+
 ## Publier sur le Play Store
 
 1. Créer un compte développeur Google Play (25 $ une seule fois) : https://play.google.com/console
@@ -160,7 +164,8 @@ Android Studio s'ouvre : choisir le téléphone en haut, puis ▶. Après chaque
    - la fiche (description, captures d'écran, icône 512×512 : `web/icons/icon-512.png`) ;
    - le questionnaire de classification : l'app fait référence à l'alcool, elle sera classée pour adultes ;
    - le public cible : 18 ans et plus ;
-   - la sécurité des données : prénom et état de la partie envoyés à Firebase pour le jeu en ligne seulement, rien d'autre ;
+   - la sécurité des données : prénom et état de la partie envoyés à Firebase pour le jeu en ligne ; si le joueur accepte,
+     données d'utilisation et plantages envoyés à Google Analytics (sans prénom) ;
    - la politique de confidentialité : l'adresse de `confidentialite.html` sur le site.
 4. Envoyer le fichier `.aab` en **test interne** d'abord, l'installer sur ton téléphone, puis passer en production.
 
