@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Tournée Admin</title>
+<!-- Tableau de bord d'administration : réservé aux adresses de ADMIN_EMAILS (Netlify).
+     Données servies par netlify/functions/admin.mjs : Google Analytics, Stripe, comptes et achats Firebase, parties en ligne. -->
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f3f0;--surface:#fcfcfb;--surface-2:#f0efec;--line:#e2e0db;
+  --text:#0b0b0b;--muted:#52514e;--faint:#8a8984;
+  --series-1:#2a78d6;--series-1-soft:#cde2fb;--series-2:#eb6834;
+  --good:#1a7f37;--bad:#c62828;--warn:#9a6700;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#121211;--surface:#1a1a19;--surface-2:#242422;--line:#33332f;
+    --text:#ffffff;--muted:#c3c2b7;--faint:#8f8e86;
+    --series-1:#3987e5;--series-1-soft:#1c3a5e;--series-2:#d95926;
+    --good:#4ac26b;--bad:#ff7b72;--warn:#d4a72c;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121211;--surface:#1a1a19;--surface-2:#242422;--line:#33332f;
+  --text:#ffffff;--muted:#c3c2b7;--faint:#8f8e86;
+  --series-1:#3987e5;--series-1-soft:#1c3a5e;--series-2:#d95926;
+  --good:#4ac26b;--bad:#ff7b72;--warn:#d4a72c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+main{max-width:1180px;margin:0 auto;padding:16px 16px 48px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;justify-content:space-between}
+header h1{margin:0;font-size:22px}
+.who{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font-size:14px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 14px;font-weight:600}
+.btn.primary{background:var(--series-1);border-color:var(--series-1);color:#fff}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;border:1px solid currentColor}
+.pill.test{color:var(--warn)}.pill.live{color:var(--good)}
+h2{margin:6px 0 0;font-size:17px}
+.sub{margin:0;color:var(--muted);font-size:13.5px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.grid.wide{grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.kpis{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.kpis.top,.kpis.four{grid-template-columns:repeat(4,1fr)}
+@media (max-width:700px){.kpis.top,.kpis.four{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h3{margin:0;font-size:14px;font-weight:700}
+.kpi .v{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .l{font-size:12.5px;color:var(--muted);font-weight:600}
+.kpi .s{font-size:12.5px;color:var(--faint)}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;gap:10px;align-items:center;font-size:13.5px}
+.bar .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.bar .t{height:10px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.bar .f{height:100%;background:var(--series-1);border-radius:0 4px 4px 0;min-width:2px}
+.bar .val{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;white-space:nowrap}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .axis{fill:var(--faint);font-size:11px}
+.chart .grid-l{stroke:var(--line);stroke-width:1}
+.tip{position:absolute;pointer-events:none;background:var(--text);color:var(--surface);font-size:12.5px;padding:6px 9px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-110%);display:none;z-index:2}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600;font-size:12.5px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.err{font-size:13px;color:var(--warn);background:var(--surface-2);border-radius:10px;padding:8px 10px;margin:0}
+.loading{color:var(--faint);font-size:13.5px}
+.login{max-width:420px;margin:12vh auto 0;text-align:center;align-items:center}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+details summary{cursor:pointer;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<main id="root"><p class="loading">Chargement…</p></main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+// Même configuration Web que l'app (web/js/core/account.js). Ce n'est pas secret.
+firebase.initializeApp({
+  apiKey: 'AIzaSyBaENuga5UjphIJZ5g4LuZG5OX3QrDNJzU',
+  authDomain: 'tournee-81b4c.firebaseapp.com',
+  projectId: 'tournee-81b4c',
+  appId: '1:573393514642:web:f183d03878283a9b8b364b'
+});
+const auth = firebase.auth();
+const root = document.getElementById('root');
+
+// ---------- Libellés ----------
+const GAME = { palmier: 'Palmier', riviere: 'Rivière', purple: 'Purple', autoroute: 'Autoroute', pyramide: 'Pyramide', ascenseur: 'Ascenseur',
+  barbu: 'Barbu', jamais: 'Je n’ai jamais', aov: 'Action ou vérité', uno: 'Uno', flechettes: 'Fléchettes', puissance4: 'Puissance 4' };
+const THEME = { soft: 'Soft', normal: 'Normal', hard: 'Hard', hot: 'Hot' };
+const SKIN = { classique: 'Classique', nuit: 'Nuit blanche', tapis: 'Tapis vert', biere: 'Pression', bistrot: 'Bistrot', or: 'Carré d’or', neon: 'Néon' };
+const EVENT = { page_view: 'Pages vues', game_start: 'Parties lancées', game_end: 'Parties quittées', game_restart: 'Parties relancées',
+  online_create: 'Parties en ligne créées', online_join: 'Joueurs ayant rejoint en ligne', online_start: 'Parties en ligne lancées',
+  setting_change: 'Réglages modifiés', skin_use: 'Skins activés', skin_interest: 'Skins payants touchés', theme_change: 'Thèmes choisis',
+  install: 'Installations (bouton Android)', undo: 'Annulations', exception: 'Erreurs JavaScript', login: 'Connexions au compte',
+  begin_checkout: 'Paiements ouverts', purchase: 'Achats débloqués', session_start: 'Sessions', first_visit: 'Premières visites',
+  user_engagement: 'Engagement', scroll: 'Défilements', click: 'Clics sortants' };
+const DEVICE = { mobile: 'Téléphone', desktop: 'Ordinateur', tablet: 'Tablette' };
+const MODE = { installee: 'App installée (écran d’accueil)', site: 'Site', android: 'App Android' };
+
+// ---------- Outils ----------
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const nf = n => (n ?? 0).toLocaleString('fr-FR');
+const eur = c => ((c || 0) / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+const pct = (a, b) => (b ? Math.round(a / b * 100) + ' %' : '–');
+const dur = s => (s >= 60 ? `${Math.floor(s / 60)} min ${String(Math.round(s % 60)).padStart(2, '0')}` : `${Math.round(s)} s`);
+const gaDay = d => `${d.slice(6, 8)}/${d.slice(4, 6)}`;
+const isoDay = d => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
+const kpi = (l, v, s = '') => `<div class="card kpi"><span class="l">${l}</span><span class="v">${v}</span>${s ? `<span class="s">${s}</span>` : ''}</div>`;
+const card = (title, body, sub = '') => `<div class="card"><h3>${title}</h3>${sub ? `<p class="sub">${sub}</p>` : ''}${body}</div>`;
+const errBox = m => `<p class="err">${esc(m)}</p>`;
+// Message clair quand un champ personnalisé n'est pas déclaré dans Google Analytics
+function gaErr(r, field) {
+  if (!r?.error) return '';
+  if (/customEvent|customUser|dimension|metric/i.test(r.error) && field)
+    return errBox(`Champ « ${field} » pas encore déclaré dans Google Analytics : Admin → Définitions personnalisées. Les données arrivent ensuite au bout de 24 à 48 h.`);
+  return errBox(r.error);
+}
+// Liste de barres horizontales triées, valeur écrite à droite
+function bars(rows, fmt = nf) {
+  if (!rows.length) return '<p class="sub">Pas encore de données.</p>';
+  const max = Math.max(...rows.map(r => r.v), 1);
+  return `<div class="bars">${rows.map(r => `<div class="bar" title="${esc(r.label)} : ${esc(fmt(r.v))}">
+    <span class="n">${esc(r.label)}</span><span class="t"><span class="f" style="width:${Math.max(1, r.v / max * 100)}%;display:block"></span></span>
+    <span class="val">${fmt(r.v)}</span></div>`).join('')}</div>`;
+}
+// Somme des lignes GA par première dimension, avec filtre éventuel sur le nom d'évènement (2e dimension)
+function gaSum(r, event, labels = {}) {
+  if (!Array.isArray(r)) return [];
+  const o = {};
+  for (const x of r) if (!event || x.dims[1] === event) { const k = x.dims[0] || '(non renseigné)'; o[k] = (o[k] || 0) + x.vals[0]; }
+  return Object.entries(o).filter(([k]) => k !== '(not set)').map(([k, v]) => ({ label: labels[k] || k, v })).sort((a, b) => b.v - a.v);
+}
+
+// Courbe (une série) ou colonnes, avec info-bulle au survol. points = [{ x: libellé, v }]
+let chartId = 0;
+function chart(points, { type = 'line', fmt = nf, label = '' } = {}) {
+  if (!points.length) return '<p class="sub">Pas encore de données.</p>';
+  const id = 'c' + chartId++, W = 640, H = 200, L = 34, B = 22, T = 8, n = points.length;
+  const max = Math.max(...points.map(p => p.v), 1), nice = niceMax(max);
+  const x = i => L + (type === 'line' ? (n === 1 ? (W - L) / 2 : i * (W - L) / (n - 1)) : (i + 0.5) * (W - L) / n);
+  const y = v => T + (H - T - B) * (1 - v / nice);
+  const ticks = [0, nice / 2, nice];
+  let marks = '';
+  if (type === 'line') {
+    const d = points.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`).join('');
+    marks = `<path d="${d}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  } else {
+    const bw = Math.max(2, (W - L) / n - 2);
+    marks = points.map((p, i) => p.v ? `<rect x="${(x(i) - bw / 2).toFixed(1)}" y="${y(p.v).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H - B - y(p.v)).toFixed(1)}" rx="3" fill="var(--series-1)"/>` : '').join('');
+  }
+  const step = Math.ceil(n / 8);
+  const xl = points.map((p, i) => (i % step === 0 && n - 1 - i >= step / 2) || i === n - 1 ? `<text class="axis" x="${x(i)}" y="${H - 6}" text-anchor="middle">${esc(p.x)}</text>` : '').join('');
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">
+    ${ticks.map(t => `<line class="grid-l" x1="${L}" x2="${W}" y1="${y(t)}" y2="${y(t)}"/><text class="axis" x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${fmt(t)}</text>`).join('')}
+    ${marks}${xl}
+    <line id="${id}-x" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--faint)" stroke-dasharray="3 3" style="display:none"/>
+    <circle id="${id}-d" r="5" fill="var(--series-1)" stroke="var(--surface)" stroke-width="2" style="display:none"/>
+    <rect x="${L}" y="0" width="${W - L}" height="${H}" fill="transparent" data-chart="${id}"/></svg>`;
+  CHARTS[id] = { points, x, y, fmt, W, type };
+  return `<div class="chart">${svg}<div class="tip" id="${id}-t"></div></div>`;
+}
+const CHARTS = {};
+function niceMax(v) { const p = 10 ** Math.floor(Math.log10(v)); return Math.ceil(v / p) * p; }
+document.addEventListener('pointermove', e => {
+  const hit = e.target.closest?.('[data-chart]');
+  document.querySelectorAll('.tip').forEach(t => { if (!hit || t.id !== hit.dataset.chart + '-t') t.style.display = 'none'; });
+  document.querySelectorAll('[id$="-x"],[id$="-d"]').forEach(el => { if (!hit || !el.id.startsWith(hit.dataset.chart + '-')) el.style.display = 'none'; });
+  if (!hit) return;
+  const c = CHARTS[hit.dataset.chart], svg = hit.ownerSVGElement, box = svg.getBoundingClientRect();
+  const sx = (e.clientX - box.left) * c.W / box.width;
+  let i = 0, best = Infinity;
+  c.points.forEach((p, k) => { const d = Math.abs(c.x(k) - sx); if (d < best) { best = d; i = k; } });
+  const p = c.points[i], id = hit.dataset.chart, ratio = box.width / c.W;
+  const line = document.getElementById(id + '-x'), dot = document.getElementById(id + '-d'), tip = document.getElementById(id + '-t');
+  line.setAttribute('x1', c.x(i)); line.setAttribute('x2', c.x(i)); line.style.display = '';
+  if (c.type === 'line') { dot.setAttribute('cx', c.x(i)); dot.setAttribute('cy', c.y(p.v)); dot.style.display = ''; }
+  tip.innerHTML = `<b>${esc(p.x)}</b> · ${esc(c.fmt(p.v))}`;
+  tip.style.left = c.x(i) * ratio + 'px'; tip.style.top = c.y(p.v) * ratio + 'px'; tip.style.display = 'block';
+});
+
+// ---------- Données ----------
+const D = {}, ERR = {};
+async function load(src) {
+  try {
+    const token = await auth.currentUser.getIdToken();
+    const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, src }) });
+    const data = await r.json().catch(() => ({}));
+    if (r.status === 403) throw new Error(`Le compte ${auth.currentUser.email} n’est pas dans ADMIN_EMAILS (Netlify).`);
+    if (!r.ok) throw new Error(data.error || `Erreur ${r.status}`);
+    D[src] = data; delete ERR[src];
+  } catch (e) { ERR[src] = e.message === 'Failed to fetch' ? 'Serveur injoignable' : e.message; }
+  draw();
+}
+function loadAll() { ['realtime', 'firebase', 'stripe', 'ga'].forEach(load); }
+
+// ---------- Affichage ----------
+function draw() {
+  chartId = 0;
+  const u = auth.currentUser;
+  const S = D.stripe, F = D.firebase, G = D.ga, R = D.realtime;
+  const wait = src => ERR[src] ? errBox(`${{ stripe: 'Stripe', firebase: 'Firebase', ga: 'Google Analytics', realtime: 'Temps réel' }[src]} : ${ERR[src]}`) : '<p class="loading">Chargement…</p>';
+  const T = Array.isArray(G?.totals) ? Object.fromEntries(G.totals.map(r => [r.dims[0], r.vals])) : null;
+  const ev = Array.isArray(G?.events) ? Object.fromEntries(G.events.map(r => [r.dims[0], r.vals[0]])) : {};
+
+  // Indicateurs clés
+  const tiles = [
+    kpi('En ce moment', R ? nf(R.active) : '…', 'utilisateurs, 30 dernières min'),
+    kpi('Actifs aujourd’hui', T?.j ? nf(T.j[0]) : '…', T?.s ? `${nf(T.s[0])} sur 7 jours` : ''),
+    kpi('Actifs sur 28 jours', T?.m ? nf(T.m[0]) : '…', T?.m ? `dont ${nf(T.m[1])} nouveaux` : ''),
+    kpi('Parties lancées', G ? nf(ev.game_start || 0) : '…', '28 jours'),
+    kpi('Comptes', F ? nf(F.accounts) : '…', F ? `${nf(F.new30)} créés sur 30 jours` : ''),
+    kpi('Acheteurs', F ? nf(F.buyers) : '…', F ? `${pct(F.buyers, F.accounts)} des comptes` : ''),
+    kpi('Revenus', S ? eur(S.revenue) : '…', S ? `${eur(S.revenue30)} sur 30 jours` : ''),
+    kpi('Ventes', S ? nf(S.sales) : '…', S ? `${nf(S.sales30)} sur 30 jours` : '')
+  ].join('');
+
+  // Audience
+  const daily = Array.isArray(G?.daily) ? G.daily.map(r => ({ x: gaDay(r.dims[0]), v: r.vals[0] })) : [];
+  const audience = G ? `
+    <div class="grid wide">
+      ${card('Utilisateurs actifs par jour', gaErr(G.daily) || chart(daily, { label: 'Utilisateurs actifs par jour sur 28 jours' }), '28 derniers jours')}
+      ${card('Engagement', T?.m ? `<table><tr><th></th><th class="num">Aujourd’hui</th><th class="num">7 j</th><th class="num">28 j</th></tr>
+        ${[['Sessions', 2, nf], ['Pages et jeux vus', 4, nf], ['Durée moyenne d’une session', 3, dur], ['Taux d’engagement', 5, v => Math.round(v * 100) + ' %']]
+          .map(([l, i, f]) => `<tr><td>${l}</td>${['j', 's', 'm'].map(k => `<td class="num">${T[k] ? f(T[k][i]) : '–'}</td>`).join('')}</tr>`).join('')}</table>` : gaErr(G.totals))}
+    </div>
+    <div class="grid">
+      ${card('Pays', gaErr(G.countries) || bars(gaSum(G.countries)))}
+      ${card('Appareils', gaErr(G.devices) || bars(gaSum(G.devices, null, DEVICE)))}
+      ${card('Comment on joue', gaErr(G.modes, 'app_mode') || bars(gaSum(G.modes, null, MODE)), 'Site, app installée ou app Android')}
+      ${card('En ce moment', R ? bars(R.screens.map(r => ({ label: r.dims[0], v: r.vals[0] }))) : wait('realtime'), 'Écrans ouverts, 30 dernières minutes')}
+    </div>` : wait('ga');
+
+  // Jeux
+  let durRows = [];
+  if (Array.isArray(G?.durations)) durRows = G.durations.filter(r => r.dims[0] !== '(not set)').map(r => ({ label: GAME[r.dims[0]] || r.dims[0], n: r.vals[0], avg: r.vals[0] ? r.vals[1] / r.vals[0] : 0 })).sort((a, b) => b.avg - a.avg);
+  const games = G ? `<div class="grid wide">
+      ${card('Parties lancées par jeu', gaErr(G.games, 'game') || bars(gaSum(G.games, 'game_start', GAME)), '28 derniers jours, sur un téléphone')}
+      ${card('Durée moyenne d’une partie', gaErr(G.durations, 'game / duration_sec') || (durRows.length ? `<table><tr><th>Jeu</th><th class="num">Parties</th><th class="num">Durée moyenne</th></tr>
+        ${durRows.map(r => `<tr><td>${esc(r.label)}</td><td class="num">${nf(r.n)}</td><td class="num">${dur(r.avg)}</td></tr>`).join('')}</table>` : '<p class="sub">Pas encore de données.</p>'))}
+      ${card('Thème de la soirée', gaErr(G.themes, 'theme') || bars(gaSum(G.themes, 'theme_change', THEME)), 'Thèmes choisis, 28 jours')}
+      ${card('Pages et jeux les plus vus', gaErr(G.pages) || bars(gaSum(G.pages)))}
+    </div>` : wait('ga');
+
+  // Monétisation
+  const interest = gaSum(G?.skins, 'skin_interest', SKIN), used = gaSum(G?.skins, 'skin_use', SKIN);
+  const money = `<div class="kpis four">
+      ${kpi('Skins payants touchés', G ? nf(ev.skin_interest || 0) : '…', '28 jours')}
+      ${kpi('Paiements ouverts', G ? nf(ev.begin_checkout || 0) : '…', G ? `${pct(ev.begin_checkout || 0, ev.skin_interest || 0)} des skins touchés` : '')}
+      ${kpi('Achats débloqués', G ? nf(ev.purchase || 0) : '…', G ? `${pct(ev.purchase || 0, ev.begin_checkout || 0)} des paiements ouverts` : '')}
+      ${kpi('Remboursements', S ? nf(S.refunds) : '…', S ? eur(S.refunded) : '')}
+    </div>
+    <div class="grid wide">
+      ${S ? card('Revenus par jour', chart(S.days.map(p => ({ x: isoDay(p.d), v: p.v })), { type: 'col', fmt: eur, label: 'Revenus par jour sur 30 jours' }), '30 derniers jours') : card('Revenus par jour', wait('stripe'))}
+      ${S ? card('Ventes par article', bars(S.byItem.map(r => ({ label: `${r.name} (${nf(r.count)})`, v: r.amount })), eur)) : card('Ventes par article', wait('stripe'))}
+      ${card('Envie d’acheter : skins payants touchés', G ? (gaErr(G.skins, 'skin') || bars(interest)) : wait('ga'), '28 jours')}
+      ${card('Skins utilisés', G ? (gaErr(G.skins, 'skin') || bars(used)) : wait('ga'), '28 jours')}
+    </div>
+    ${S ? card('Dernières ventes', S.recent.length ? `<div class="scroll"><table><tr><th>Date</th><th>Article</th><th>Compte</th><th class="num">Montant</th></tr>
+      ${S.recent.map(r => `<tr><td>${new Date(r.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</td><td>${esc(r.item)}</td><td>${esc(r.email)}</td><td class="num">${eur(r.amount)}</td></tr>`).join('')}</table></div>` : '<p class="sub">Aucune vente pour l’instant.</p>') : ''}`;
+
+  // Comptes et jeu en ligne
+  const accounts = F ? `<div class="grid wide">
+      ${card('Comptes créés par jour', chart(F.days.map(p => ({ x: isoDay(p.d), v: p.v })), { type: 'col', label: 'Comptes créés par jour' }), `${nf(F.active7)} comptes connectés ces 7 derniers jours`)}
+      ${card('Connexion', bars(Object.entries(F.provider).map(([label, v]) => ({ label, v }))))}
+      ${card('Articles possédés', bars(F.owned.map(o => ({ label: o.name, v: o.n }))), `${nf(F.purchases)} achats enregistrés dans Firebase`)}
+      ${card('Parties en ligne en cours', `<div class="kpis">${kpi('Parties', nf(F.rooms.live), `dont ${nf(F.rooms.playing)} en jeu`)}${kpi('Joueurs', nf(F.rooms.players))}</div>
+        ${bars(Object.entries(F.rooms.games).map(([k, v]) => ({ label: GAME[k] || k, v })))}`, 'Créées ces 12 dernières heures')}
+      ${G ? card('Rejoindre une partie en ligne', gaErr(G.online, 'method') || bars(gaSum(G.online, 'online_join', { qr: 'QR code scanné', lien: 'Lien', code: 'Code tapé' })), `${nf(ev.online_create || 0)} parties créées, ${nf(ev.online_start || 0)} lancées en 28 jours`) : ''}
+    </div>` : wait('firebase');
+
+  // Qualité et tous les évènements
+  const quality = G ? `<div class="grid wide">
+      ${card('Erreurs JavaScript', `<div class="kpis">${kpi('Erreurs', nf(ev.exception || 0), '28 jours')}${kpi('Annulations', nf(ev.undo || 0), 'bouton « Annuler »')}</div>
+        ${Array.isArray(G.errors) ? bars(gaSum(G.errors)) : '<p class="sub">Pour voir le détail, déclare « description » dans GA (Définitions personnalisées).</p>'}`)}
+      ${card('Tous les évènements', Array.isArray(G.events) ? `<div class="scroll"><table><tr><th>Évènement</th><th class="num">Nombre</th><th class="num">Utilisateurs</th></tr>
+        ${G.events.map(r => `<tr><td>${esc(EVENT[r.dims[0]] || r.dims[0])}</td><td class="num">${nf(r.vals[0])}</td><td class="num">${nf(r.vals[1])}</td></tr>`).join('')}</table></div>` : gaErr(G.events), '28 derniers jours')}
+    </div>` : wait('ga');
+
+  root.innerHTML = `
+    <header>
+      <h1>Tournée · Admin ${S ? `<span class="pill ${S.mode}">${S.mode === 'live' ? 'Paiements réels' : 'Paiements en mode test'}</span>` : ''}</h1>
+      <div class="who">${esc(u.email)} <button class="btn" id="refresh">Actualiser</button><button class="btn" id="out">Se déconnecter</button></div>
+    </header>
+    <div class="kpis top">${tiles}</div>
+    <h2>Audience</h2>${audience}
+    <h2>Jeux</h2>${games}
+    <h2>Monétisation</h2>${money}
+    <h2>Comptes et jeu en ligne</h2>${accounts}
+    <h2>Qualité</h2>${quality}
+    <p class="sub">Google Analytics a 24 à 48 h de retard, sauf « En ce moment ». Mis à jour à ${new Date().toLocaleTimeString('fr-FR')}.</p>`;
+  document.getElementById('refresh').onclick = loadAll;
+  document.getElementById('out').onclick = () => auth.signOut();
+}
+
+function loginView(msg = '') {
+  root.innerHTML = `<div class="card login"><h1 style="margin:0;font-size:22px">Tournée · Admin</h1>
+    <p class="sub">Réservé aux administrateurs.</p>${msg ? errBox(msg) : ''}
+    <button class="btn primary" id="in">Se connecter avec Google</button></div>`;
+  document.getElementById('in').onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => {
+    if (e.code !== 'auth/popup-closed-by-user') loginView(e.message);
+  });
+}
+
+let timer;
+auth.onAuthStateChanged(u => {
+  clearInterval(timer);
+  if (!u) { loginView(); return; }
+  draw(); loadAll();
+  timer = setInterval(() => load('realtime'), 60000); // « En ce moment » se met à jour chaque minute
+});
+</script>
+</body>
+</html>

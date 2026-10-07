@@ -3,6 +3,8 @@
 //   STRIPE_SECRET_KEY      clé secrète Stripe (sk_test_… en mode test)
 //   STRIPE_WEBHOOK_SECRET  secret de signature du webhook Stripe (whsec_…)
 //   FIREBASE_CLIENT_EMAIL  et FIREBASE_PRIVATE_KEY : compte de service Firebase (fichier JSON de la console Firebase)
+//   ADMIN_EMAILS           adresses autorisées sur le tableau de bord /admin, séparées par des virgules
+//   GA_PROPERTY_ID         numéro de la propriété Google Analytics (Admin → Détails de la propriété)
 import Stripe from 'stripe';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
@@ -20,7 +22,7 @@ export const CATALOG = {
 
 export const stripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
 
-function firebase() {
+export function firebase() {
   if (!getApps().length) {
     initializeApp({
       credential: cert({

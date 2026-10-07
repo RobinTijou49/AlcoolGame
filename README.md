@@ -170,6 +170,22 @@ ouvert `https://tourneegame.netlify.app/?paytest=1` (`?paytest=0` pour en sortir
 rappelle la carte de test Stripe 4242 4242 4242 4242. Pour ouvrir la vente : clés Stripe *live* dans Netlify, nouveau webhook
 en mode live, puis `PAY_LIVE = true`.
 
+## Tableau de bord d'administration
+
+`https://tourneegame.netlify.app/admin/` (lien caché, non indexé) rassemble au même endroit :
+Google Analytics (audience, jeux, durée des parties, thèmes, skins, jeu en ligne, erreurs, temps réel),
+Stripe (revenus, ventes par article, remboursements, dernières ventes), Firebase (comptes, achats, parties en ligne en cours).
+Page : `web/admin/index.html`. Données : `netlify/functions/admin.mjs` (`/api/admin`), qui vérifie que le compte connecté
+est dans `ADMIN_EMAILS`.
+
+Pour l'activer :
+1. Netlify → Environment variables : `ADMIN_EMAILS` (ton adresse Google, plusieurs séparées par des virgules) et
+   `GA_PROPERTY_ID` (Google Analytics → Admin → Détails de la propriété → numéro de la propriété).
+2. Google Cloud (projet tournee-81b4c) → API et services → Bibliothèque : activer **Google Analytics Data API**.
+3. Google Analytics → Admin → Gestion des accès à la propriété → ajouter l'adresse `client_email` du compte de service
+   (celle de `FIREBASE_CLIENT_EMAIL`) avec le rôle **Lecteur**.
+4. Pour le détail par jeu, thème, skin… : déclarer les définitions personnalisées listées plus haut (+ `description` pour les erreurs).
+
 ## App Android
 
 1. Installer **Node.js** (version LTS) : https://nodejs.org, et **Android Studio** : https://developer.android.com/studio
