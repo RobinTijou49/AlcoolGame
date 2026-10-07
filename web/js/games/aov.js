@@ -1,6 +1,7 @@
 // Action ou vérité : chacun son tour choisit, le téléphone tire un défi ou une question.
 // On le fait, ou on refuse et on boit. {p} est remplacé par un autre joueur tiré au hasard.
 
+// Par thème (core/themes.js) : Normal joue Soft + Normal, Hard joue Normal + Hard, Hot joue Normal + Hot
 const AOV = {
   verite: {
     soft: [
@@ -17,13 +18,29 @@ const AOV = {
       'Quelle est ta pire expérience au travail ou en stage ?', 'À quel âge as-tu arrêté de croire au père Noël ?',
       'Quelle règle de tes parents as-tu le plus enfreinte ?', 'Qui ici t’a fait la meilleure première impression ?'
     ],
-    spicy: [
-      'Qui dans cette pièce trouves-tu le plus attirant ?', 'Raconte ton pire premier rendez-vous.',
-      'As-tu déjà eu un crush sur quelqu’un ici ?', 'Quel est le message le plus gênant que tu as envoyé à un crush ?',
-      'Avec qui ici pourrais-tu sortir si tu étais célibataire ?', 'Quelle est la chose la plus folle que tu as faite par amour ?',
-      'Combien de personnes as-tu embrassées ?', 'Quelle est ta plus grosse red flag ?', 'Ton ex t’a-t-il ou elle déjà manqué ?',
-      'Quel est le plus long que tu aies mis à répondre à un message, exprès ?', 'Quel est ton type idéal, en trois mots ?',
-      'As-tu déjà fait semblant d’être occupé pour éviter quelqu’un qui te draguait ?', 'Note de 1 à 10 le charme de {p}.'
+    normal: [
+      'Raconte ton pire premier rendez-vous.', 'As-tu déjà eu un crush sur quelqu’un ici ?',
+      'Quel est le message le plus gênant que tu as envoyé à un crush ?', 'Quelle est ta plus grosse red flag ?',
+      'Ton ex t’a-t-il ou elle déjà manqué ?', 'Quel est ton type idéal, en trois mots ?', 'Combien de personnes as-tu embrassées ?',
+      'As-tu déjà fait semblant d’être occupé pour éviter quelqu’un qui te draguait ?', 'Quelle est la pire chose que tu as faite en soirée ?',
+      'Quel est le plus long que tu aies mis à répondre à un message, exprès ?', 'Note de 1 à 10 le charme de {p}.',
+      'Quelle est la dernière chose que tu as recherchée sur ton téléphone ?', 'Avec qui ici pourrais-tu sortir si tu étais célibataire ?'
+    ],
+    hard: [
+      'Qui ici t’énerve le plus, et pourquoi ?', 'Quel est le pire truc que tu as dit dans le dos de quelqu’un ici ?',
+      'As-tu déjà trompé quelqu’un ?', 'Quel est ton plus grand regret amoureux ?', 'Qui ici a le pire style ?',
+      'Quel secret n’as-tu jamais dit à tes parents ?', 'Si tu devais retirer un joueur de ce groupe, lequel ?',
+      'Quelle est la chose la plus illégale que tu aies faite ?', 'Avec qui ici ne partirais-tu jamais en vacances ?',
+      'Quel mensonge as-tu dit à quelqu’un dans cette pièce ?', 'Qu’est-ce que tu n’oses pas dire à {p} ?',
+      'Quelle est la chose la plus méchante que tu aies faite à un ex ?'
+    ],
+    hot: [
+      'Quel est ton plus gros fantasme ?', 'Quel est l’endroit le plus insolite où tu as fait l’amour ?',
+      'Avec qui ici passerais-tu une nuit ?', 'Quelle est ta pire expérience au lit ?', 'Plutôt dominer ou être dominé(e) ?',
+      'Quelle partie du corps de {p} préfères-tu ?', 'Quelle est la chose la plus osée que tu aies envoyée par message ?',
+      'Lumière allumée ou éteinte ?', 'As-tu déjà eu un plan d’un soir ? Raconte.', 'Quel est ton meilleur souvenir coquin ?',
+      'Qui ici embrasse le mieux, d’après toi ?', 'Qu’est-ce qui te refroidit tout de suite chez quelqu’un ?',
+      'Quel est le compliment le plus sexy qu’on t’ait fait ?'
     ]
   },
   action: {
@@ -40,20 +57,33 @@ const AOV = {
       'Tiens la planche 30 secondes.', 'Raconte ta journée comme un commentateur sportif.', 'Fais rire {p} en moins de 30 secondes.',
       'Envoie un emoji au hasard à la 5e personne de tes conversations, sans explication.', 'Chante tout ce que tu dis jusqu’à ton prochain tour.'
     ],
-    spicy: [
-      'Fais un slow de 20 secondes avec {p}.', 'Fais ta meilleure technique de drague sur {p}.',
-      'Laisse {p} lire ton dernier échange de messages (une seule conversation, choisie par toi).',
-      'Fais un massage des épaules à {p} pendant 30 secondes.', 'Regarde {p} dans les yeux 30 secondes sans rire.',
-      'Fais un bisou sur la joue au joueur de ton choix.', 'Like la plus vieille photo du profil Instagram de {p}.',
-      'Assieds-toi sur les genoux de {p} jusqu’à ton prochain tour.', 'Dis à {p} ce qui te plaît le plus chez lui ou elle.',
-      'Laisse {p} écrire ta prochaine story (sans rien de méchant).', 'Fais un clin d’œil séducteur à chaque joueur.'
+    normal: [
+      'Fais ta meilleure technique de drague sur {p}.', 'Regarde {p} dans les yeux 30 secondes sans rire.',
+      'Laisse {p} écrire ta prochaine story (sans rien de méchant).', 'Fais un clin d’œil séducteur à chaque joueur.',
+      'Like la plus vieille photo du profil Instagram de {p}.', 'Dis à {p} ce qui te plaît le plus chez lui ou elle.',
+      'Imite {p} en train de draguer quelqu’un.', 'Laisse le groupe lire tes 5 derniers emojis utilisés et les commenter.',
+      'Appelle un ami et chante-lui joyeux anniversaire.', 'Fais une déclaration d’amour à {p} façon téléréalité.'
+    ],
+    hard: [
+      'Laisse {p} envoyer un message de son choix (rien de méchant) à un de tes contacts.', 'Montre tes 5 dernières recherches Google.',
+      'Laisse {p} regarder ta galerie photo pendant 20 secondes.', 'Appelle ton dernier contact et dis-lui que tu l’aimes, sans expliquer.',
+      'Poste une story choisie par le groupe.', 'Laisse {p} répondre à ton prochain message reçu.', 'Fais 20 pompes.',
+      'Lis à voix haute le dernier message que tu as envoyé.', 'Laisse le groupe te coiffer comme il veut.',
+      'Goûte un mélange choisi par le groupe (rien de dangereux ni d’alcoolisé).'
+    ],
+    hot: [
+      'Fais un slow de 30 secondes avec {p}.', 'Masse les épaules de {p} pendant 30 secondes.',
+      'Assieds-toi sur les genoux de {p} jusqu’à ton prochain tour.', 'Fais un bisou à {p} sur la joue, la main ou le cou, au choix de {p}.',
+      'Retire un vêtement (les chaussettes et les accessoires comptent).', 'Murmure quelque chose de sexy à l’oreille de {p}.',
+      'Fais une danse sensuelle de 20 secondes.', 'Mime ta technique de séduction sur {p}.', 'Fais un compliment sexy à chaque joueur.',
+      'Mange un fruit ou un bonbon de la façon la plus sexy possible.', 'Laisse {p} choisir quelqu’un que tu dois embrasser sur la joue.'
     ]
   }
 };
 
 // Tire le prochain défi ou la prochaine question d'un type, en remélangeant quand tout est passé
 function aovDraw(g, mode) {
-  if (!g.decks[mode].length) g.decks[mode] = shuffle(AOV[mode].soft.concat(g.spicy ? AOV[mode].spicy : []));
+  if (!g.decks[mode].length) g.decks[mode] = shuffle(themePool(AOV[mode], g.theme || 'normal'));
   const who = g.order[g.turn % g.order.length], others = g.order.filter(p => p !== who);
   return g.decks[mode].pop().replace(/\{p\}/g, () => others[Math.floor(Math.random() * others.length)]);
 }
@@ -63,7 +93,7 @@ defineGame({
   desc: 'Choisis : un défi à relever ou une question à laquelle répondre.', meta: '2 joueurs et +',
 
   init() {
-    return { order: order(), turn: 0, mode: null, text: '', spicy: cfg('aov', 'level') === 'all', decks: { action: [], verite: [] }, last: null };
+    return { order: order(), turn: 0, mode: null, text: '', theme: S.theme, decks: { action: [], verite: [] }, last: null };
   },
 
   screen() {
@@ -83,9 +113,10 @@ defineGame({
       ${rules([
         'Chacun son tour choisit <b>Action</b> (un défi) ou <b>Vérité</b> (une question).',
         `On le fait, ou on refuse et on boit ${plural(n, 'gorgée')}.`,
-        'Personne n’est obligé de faire un défi qui le met mal à l’aise : refuser fait partie du jeu.'
+        'Personne n’est obligé de faire un défi qui le met mal à l’aise : refuser fait partie du jeu.',
+        'Un défi qui touche quelqu’un se fait seulement s’il ou elle est d’accord.'
       ], 'aov')}
-      <div class="turn"><span class="sub">${g.mode ? 'Pour' : 'À toi de choisir'}</span><span class="who">${esc(p)}</span></div>
+      <div class="turn"><span class="sub">Thème ${themeName(g.theme || 'normal')} · ${g.mode ? 'pour' : 'à toi de choisir'}</span><span class="who">${esc(p)}</span></div>
       ${body}`;
   },
 

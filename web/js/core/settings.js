@@ -47,11 +47,9 @@ const SETTINGS = {
   ] },
   // Jeux d'ambiance (sans cartes)
   jamais: { name: 'Je n’ai jamais', opts: [
-    { key: 'level', label: 'Questions', choices: [['soft', 'tranquilles'], ['all', 'tranquilles et épicées']], def: 'soft' },
     { key: 'sips', label: 'Gorgées pour ceux qui l’ont déjà fait', num: [1, 3], def: 1 }
   ] },
   aov: { name: 'Action ou vérité', opts: [
-    { key: 'level', label: 'Défis et questions', choices: [['soft', 'tranquilles'], ['all', 'tranquilles et épicés']], def: 'soft' },
     { key: 'refuse', label: 'Gorgées si on refuse', num: [1, 5], def: 2 }
   ] }
 };

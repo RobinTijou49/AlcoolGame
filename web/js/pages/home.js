@@ -32,6 +32,7 @@ SCREENS.home = function () {
     </div>
     ${canOfferInstall() ? `<button class="banner" data-act="install">${SHARE_ICON}<span><b>Installe Tournée</b> sur ton écran d’accueil pour l’ouvrir comme une app.</span></button>` : ''}
     ${whoHTML()}
+    ${themeHTML()}
     ${gamesHTML('home', 'Jeux de cartes')}
     ${gamesHTML('party', 'Sans cartes')}`;
 };

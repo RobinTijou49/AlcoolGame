@@ -1,5 +1,5 @@
 // Éditeur de cartes : changer le nom, l'action et les gorgées comptées de chaque carte du Palmier et du Barbu.
-// Les modifications s'enregistrent à chaque frappe (S.rules, défini dans core/card-rules.js).
+// Les modifications s'enregistrent à chaque frappe (S.rules, défini dans core/card-rules.js), pour le thème de la soirée.
 
 SCREENS.editor = function () {
   const id = S.editId, R = S.rules[id];
@@ -8,7 +8,7 @@ SCREENS.editor = function () {
       <h2>Mes règles</h2><span></span>
     </div>
     <div class="tabs">${['palmier', 'barbu'].map(t => `<button class="chip pick" data-act="editor" data-arg="${t}" aria-pressed="${t === id}">${t === 'palmier' ? 'Palmier' : 'Barbu'}</button>`).join('')}</div>
-    <p class="muted" style="margin:0;font-size:14px">Les changements s’enregistrent tout seuls sur ce téléphone. « Gorgées comptées » ajoute des gorgées au compteur de celui qui tire la carte.</p>
+    <p class="muted" style="margin:0;font-size:14px">Cartes du thème <b>${themeName(S.theme)}</b> (il se change en haut de l’onglet À boire). Les changements s’enregistrent tout seuls sur ce téléphone. « Gorgées comptées » ajoute des gorgées au compteur de celui qui tire la carte.</p>
     <div class="edit">${Object.entries(R).map(([v, r]) => {
       const c = { v: +v, s: '♠', red: false, sn: 'pique' };
       return `<div class="erow">${cardHTML(c)}
@@ -30,8 +30,8 @@ Object.assign(A, {
   backToGame() { S.screen = S.editBack; S.editBack = null; render(); scrollTop(); },
   resetRules() {
     if (!S.confirmReset) { S.confirmReset = true; render(); return; }
-    S.rules[S.editId] = clone(DEFAULT_RULES[S.editId]);
-    store.set('rules:' + S.editId, S.rules[S.editId]);
+    S.rules[S.editId] = themeRules(S.editId);
+    store.set(ruleKey(S.editId), S.rules[S.editId]);
     S.confirmReset = false; render(); toast('Règles d’origine rétablies');
   }
 });
@@ -41,5 +41,5 @@ document.addEventListener('input', e => {
   const f = e.target.dataset?.rule; if (!f) return;
   const [id, v, k] = f.split(':');
   S.rules[id][v][k] = k === 'sips' ? Math.max(0, Math.min(20, parseInt(e.target.value, 10) || 0)) : e.target.value;
-  store.set('rules:' + id, S.rules[id]);
+  store.set(ruleKey(id), S.rules[id]);
 });

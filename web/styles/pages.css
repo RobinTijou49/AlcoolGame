@@ -91,3 +91,9 @@
 .skin-act{grid-column:1/-1;display:flex;justify-content:flex-end}
 .pill{display:inline-block;border-radius:999px;padding:8px 14px;font-weight:800;font-size:14px;border:1px solid var(--line)}
 .pill.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+/* ---------- Thème de la soirée (core/themes.js) ---------- */
+.themes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.themes .chip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:10px 4px;font-weight:800}
+.themes .chip small{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.8}
+.themes .chip.premium:not([aria-pressed="true"]){border-color:var(--accent);color:var(--accent)}

@@ -3,6 +3,8 @@
 Jeux de soirée sur téléphone.
 - **À boire** : les jeux de cartes (Palmier, Rivière, Purple, Autoroute, Pyramide, Ascenseur, Barbu) et sans cartes
   (Je n'ai jamais, Action ou vérité, dont les phrases sont dans `web/js/games/jamais.js` et `aov.js`).
+  Un **thème** (Soft, Normal, Hard, Hot) change leurs phrases et les cartes du Palmier et du Barbu : `web/js/core/themes.js`.
+  Hot est marqué Premium mais gratuit pour l'instant, après confirmation « 18 ans ou plus ».
 - **Loisirs** (jeux sans alcool) : Uno, Fléchettes (on lance la fléchette d’un geste vers la cible) et Puissance 4.
 
 Tous les jeux se jouent sur un seul téléphone ou en ligne, chacun sur son téléphone (QR code pour rejoindre).
@@ -121,13 +123,14 @@ Pour l'activer :
 | `game_start` / `game_end` / `game_restart` | Partie lancée / quittée / relancée sur un téléphone | `game`, `players`, `duration_sec` |
 | `online_create` / `online_join` / `online_start` | Jeu en ligne | `method` (qr, lien, code), `game`, `players` |
 | `setting_change` | Réglage modifié | `game`, `setting` |
+| `theme_change` | Thème de la soirée choisi | `theme` (soft, normal, hard, hot) |
 | `skin_use` / `skin_interest` | Skin activé / skin premium touché | `skin` |
 | `install` | Bouton « Installer l'app » (Android) | `outcome` |
 | `undo` | Bouton « Annuler » | `game` |
 | `exception` | Erreur JavaScript chez un joueur | `description` |
 
 Propriété utilisateur `app_mode` : `installee` (écran d'accueil), `site` ou `android`. Pour voir les détails dans les rapports,
-les déclarer dans Admin → Définitions personnalisées (dimensions `game`, `method`, `setting`, `skin`, `app_mode` ; métrique `duration_sec`).
+les déclarer dans Admin → Définitions personnalisées (dimensions `game`, `method`, `setting`, `skin`, `theme`, `app_mode` ; métrique `duration_sec`).
 
 ## App Android
 

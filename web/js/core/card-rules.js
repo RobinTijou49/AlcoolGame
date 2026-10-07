@@ -33,13 +33,21 @@ DEFAULT_RULES.barbu = {
   13: { t: 'Nouvelle règle', d: 'Invente une règle valable jusqu’à la fin de la partie. Qui l’oublie boit.' }
 };
 
-// Règles enregistrées, complétées par les règles d'origine pour les champs manquants
+// Règles d'origine pour le thème de la soirée (core/themes.js) : celles du thème Normal, modifiées par le thème
+function themeRules(id, theme = S.theme || 'normal') {
+  const out = clone(DEFAULT_RULES[id]), over = THEME_RULES[theme]?.[id] || {};
+  for (const v in over) out[v] = clone(over[v]);
+  return out;
+}
+// Les cartes modifiées dans l'éditeur sont enregistrées pour chaque thème (Normal garde l'ancienne clé)
+const ruleKey = id => (!S.theme || S.theme === 'normal' ? 'rules:' + id : `rules:${id}:${S.theme}`);
+// Règles enregistrées, complétées par les règles d'origine du thème pour les champs manquants
 function loadRules(id) {
-  const saved = store.get('rules:' + id, null) || {}, out = clone(DEFAULT_RULES[id]);
+  const saved = store.get(ruleKey(id), null) || {}, out = themeRules(id);
   for (const v in out) out[v] = Object.assign(out[v], saved[v] || {});
   return out;
 }
-S.rules = { palmier: loadRules('palmier'), barbu: loadRules('barbu') };
+// S.rules (les cartes du thème choisi) est rempli par core/themes.js, chargé plus loin
 
 // Bloc « Règles » dépliable du Palmier et du Barbu : la liste des cartes et leur action
 function rulesList(id) {
@@ -50,7 +58,7 @@ function rulesList(id) {
 }
 function rulesBlock(id) {
   if (CTX.online) return `<details class="rules"><summary>Règles</summary><ul>${rulesList(id).map(i => `<li>${i}</li>`).join('')}</ul></details>`;
-  return `<details class="rules"><summary>Règles</summary><ul>${rulesList(id).map(i => `<li>${i}</li>`).join('')}</ul>
+  return `<details class="rules"><summary>Règles · thème ${themeName(S.theme)}</summary><ul>${rulesList(id).map(i => `<li>${i}</li>`).join('')}</ul>
     <p class="row" style="margin:0 0 14px"><button class="btn" data-act="editor" data-arg="${id}">Modifier les cartes</button>
       <button class="btn" data-act="settings" data-arg="${id}">Réglages de ce jeu</button></p></details>`;
 }
